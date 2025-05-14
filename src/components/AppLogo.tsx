@@ -12,7 +12,7 @@ const AppLogo: React.FC<AppLogoProps> = ({ theme = 'light' }) => {
 
   return (
     <div className="flex items-center">
-      <svg
+      {/* <svg
         width="36"
         height="36"
         viewBox="0 0 32 32"
@@ -43,7 +43,12 @@ const AppLogo: React.FC<AppLogoProps> = ({ theme = 'light' }) => {
           strokeLinejoin="round"
         />
       </svg>
-      <span className={`font-bold text-xl ${textColor}`}>ImageAI</span>
+      <span className={`font-bold text-xl ${textColor}`}>ImageAI</span> */}
+      <img
+        src="/KPMGLogo.png"
+        alt="Logo"
+        className="h-24 w-24"
+      />
     </div>
   );
 };

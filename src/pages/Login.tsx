@@ -8,7 +8,7 @@ const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-white p-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden animate-fade-in">
         <div className="p-8 flex flex-col items-center">
-          <div className="mb-6">
+          <div className="-mb-4">
             <AppLogo />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
