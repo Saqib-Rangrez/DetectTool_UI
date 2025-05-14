@@ -51,6 +51,8 @@ const LoginForm: React.FC = () => {
 
       // Store the access token in localStorage
       localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("access_token_timestamp", Date.now().toString());
+      
 
       toast({
         title: "Success",

@@ -11,6 +11,8 @@ import AIDetection from "./pages/AIDetection";
 import FaceRecognition from "./pages/FaceRecognition";
 import NotFound from "./pages/NotFound";
 import Navigation from "./components/Navigation";
+import { useAutoLogout } from '@/hooks/useAutoLogout';
+import { AutoLogoutHandler } from "./components/AutoLogoutHandler";
 
 // Add Inter font import
 const interFontLink = document.createElement('link');
@@ -22,12 +24,14 @@ document.head.appendChild(interFontLink);
 const queryClient = new QueryClient();
 
 const App = () => {
+  
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
+        <AutoLogoutHandler />
           <div className="min-h-screen flex flex-col">
             <Routes>
               <Route path="/login" element={<Login />} />
