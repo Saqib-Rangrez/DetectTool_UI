@@ -32,6 +32,7 @@ export interface ImageFile {
   id: string;
   name: string;
   url: string;
+  file: File; // Store original File object
   matches?: Match[];
   isSelected?: boolean;
 }
@@ -41,6 +42,7 @@ export interface Match {
   name: string;
   url: string;
   score: number;
+  distance: number; // Add distance for display
 }
 
 export interface ProcessingStatus {
@@ -53,7 +55,7 @@ export interface ProcessingStatus {
 const FaceRecognition: React.FC = () => {
   const [inputFolder, setInputFolder] = useState<ImageFile[] | null>(null);
   const [comparisonFolder, setComparisonFolder] = useState<ImageFile[] | null>(null);
-  const [threshold, setThreshold] = useState<number>(0.75);
+  const [threshold, setThreshold] = useState<number>(30); 
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>({
     isProcessing: false,
     current: 0,
@@ -73,6 +75,7 @@ const FaceRecognition: React.FC = () => {
         id: `input-${Math.random().toString(36).substring(2, 11)}`,
         name: file.name,
         url: URL.createObjectURL(file),
+        file
       }));
     
     if (imageFiles.length === 0) {
@@ -98,6 +101,7 @@ const FaceRecognition: React.FC = () => {
         id: `comparison-${Math.random().toString(36).substring(2, 11)}`,
         name: file.name,
         url: URL.createObjectURL(file),
+        file
       }));
     
     if (imageFiles.length === 0) {
@@ -146,8 +150,8 @@ const FaceRecognition: React.FC = () => {
         }));
       }, 200);
 
-      const inputFiles = inputFolder.map(img => new File([img.url], img.name, { type: 'image/*' }));
-      const compareFiles = comparisonFolder.map(img => new File([img.url], img.name, { type: 'image/*' }));
+      const inputFiles = inputFolder.map(img => img.file);
+      const compareFiles = comparisonFolder.map(img => img.file);
       const response = await compareImages(inputFiles, compareFiles, threshold);
 
       clearInterval(progressInterval);
@@ -167,7 +171,8 @@ const FaceRecognition: React.FC = () => {
               id: compareImg?.id || `match-${Math.random().toString(36).substring(2, 11)}`,
               name: match.compare_file,
               url: compareImg?.url || '',
-              score: match.result / 100 // Convert result (0-100) to score (0-1)
+              score: match.result, 
+              distance: match.distance 
             };
           });
 
@@ -181,8 +186,11 @@ const FaceRecognition: React.FC = () => {
       const filteredResults = resultsWithMatches.filter(img => img.matches && img.matches.length > 0);
 
       setResults(filteredResults);
-      if (filteredResults.length > 0) {
-        setSelectedImage(filteredResults[0]);
+      if (filteredResults.length > 0) {       
+        setInputFolder(null);
+        setComparisonFolder(null); 
+        setSelectedImage(filteredResults[0]);      
+
       }
 
       toast({
@@ -193,7 +201,7 @@ const FaceRecognition: React.FC = () => {
       if (response.errors.length > 0) {
         toast({
           title: "Processing errors",
-          description: `${response.errors.length} image(s) could not be processed.`,
+          description: `${response.errors.length} image(s) could not be processed: ${response.errors.join(', ')}`,
           variant: "destructive"
         });
       }
@@ -240,11 +248,16 @@ const FaceRecognition: React.FC = () => {
         dataUrl = URL.createObjectURL(blob);
       } else {
         const csvRows = [
-          ['Input Image', 'Matched Image', 'Similarity Score'].join(','),
+          ['Input File', 'Compare File', 'Matched', 'Distance', 'Threshold', 'Result'].join(','),
           ...results.flatMap(input =>
-            input.matches ? input.matches.map(match =>
-              [`"${input.name.replace(/"/g, '""')}"`, `"${match.name.replace(/"/g, '""')}"`, match.score.toFixed(4)].join(',')
-            ) : []
+            input.matches ? input.matches.map(match => [
+              `"${input.name.replace(/"/g, '""')}"`,
+              `"${match.name.replace(/"/g, '""')}"`,
+              'true', // Only matched results are included
+              match.distance.toFixed(2),
+              threshold.toFixed(2),
+              match.score.toFixed(2)
+            ].join(',')) : []
           )
         ];
         exportData = csvRows.join('\n');
@@ -266,13 +279,14 @@ const FaceRecognition: React.FC = () => {
         description: `Results exported as ${format.toUpperCase()}.`
       });
     }, 1500);
-  }, [results, toast]);
+  }, [results, threshold, toast]);
+
 
   const handleImageSelect = useCallback((image: ImageFile) => {
     setSelectedImage(image);
   }, []);
 
-  const showEmptyState = !inputFolder && !comparisonFolder;
+  const showEmptyState = !inputFolder && !comparisonFolder && (!results || results.length === 0);
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
@@ -334,7 +348,8 @@ const FaceRecognition: React.FC = () => {
                     onImageSelect={handleImageSelect}
                     threshold={threshold}
                   />
-                ) : !processingStatus.isProcessing && inputFolder && comparisonFolder && (
+                   
+                ) : !processingStatus.isProcessing && inputFolder && comparisonFolder  && (
                   <Card className="bg-white p-6 text-center">
                     <div className="flex flex-col items-center gap-2">
                       <ArrowRight className="h-10 w-10 text-muted-foreground mb-2" />

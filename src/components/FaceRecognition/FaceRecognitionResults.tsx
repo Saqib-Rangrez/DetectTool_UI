@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
@@ -122,7 +121,7 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
                               />
                               <div className="absolute top-3 right-3">
                                 <Badge className={`${getMatchScoreColor(match.score)}`}>
-                                  Match: {match.score.toFixed(2)}
+                                  Result: {(match.score).toFixed(2)}
                                 </Badge>
                               </div>
                             </div>
@@ -143,8 +142,11 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
                                   />
                                 </div>
                                 <div className="flex justify-between mt-1 text-xs text-gray-500">
-                                  <span>Threshold: {threshold}</span>
-                                  <span>Score: {match.score.toFixed(2)}</span>
+                                  <span>Threshold: {(threshold)}</span>
+                                  <span>Score: {(match.score).toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between mt-1 text-xs text-gray-500">
+                                  <span>Distance: {match.distance.toFixed(2)}</span>
                                 </div>
                               </div>
                             </CardContent>
@@ -157,7 +159,7 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
                           <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
                           <h4 className="text-lg font-medium">No Matches Found</h4>
                           <p className="text-sm text-muted-foreground mt-2">
-                            No matches were found for "{selectedImage.name}" with the current threshold of {threshold}.
+                            No matches were found for "{selectedImage.name}" with the current threshold of {(threshold * 100).toFixed(2)}.
                             Try lowering the threshold or select another image.
                           </p>
                         </div>
@@ -216,7 +218,7 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
                               <div className="min-w-0 flex-1">
                                 <p className="text-xs truncate" title={match.name}>{match.name}</p>
                                 <Badge className={`mt-1 text-[10px] ${getMatchScoreColor(match.score)}`}>
-                                  {match.score.toFixed(2)}
+                                  {(match.score).toFixed(2)}
                                 </Badge>
                               </div>
                             </div>

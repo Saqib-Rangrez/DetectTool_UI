@@ -312,7 +312,7 @@ export const compareImages = async (
   compareFiles.forEach((file) => {
     formData.append('compare_files', file);
   });
-  formData.append('threshold', (threshold).toString());
+  formData.append('threshold', (threshold).toString()); 
 
   const response = await fetch('http://127.0.0.1:8000/compare-faces', {
     method: 'POST',
@@ -323,7 +323,8 @@ export const compareImages = async (
   });
 
   if (!response.ok) {
-    throw new Error('Failed to compare faces');
+    const errorText = await response.text();
+    throw new Error(`Failed to compare faces: ${errorText}`);
   }
 
   return response.json();
