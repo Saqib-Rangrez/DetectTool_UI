@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Folder, Upload, Download, Info } from 'lucide-react';
@@ -18,6 +17,9 @@ interface FaceRecognitionInputProps {
   comparisonCount?: number;
   isProcessing: boolean;
   hasResults: boolean;
+  thresholdMin?: number;
+  thresholdMax?: number;
+  thresholdTooltip?: string;
 }
 
 const FaceRecognitionInput: React.FC<FaceRecognitionInputProps> = ({
@@ -30,7 +32,10 @@ const FaceRecognitionInput: React.FC<FaceRecognitionInputProps> = ({
   inputCount,
   comparisonCount,
   isProcessing,
-  hasResults
+  hasResults,
+  thresholdMin,
+  thresholdMax,
+  thresholdTooltip
 }) => {
   // Create refs for the hidden file inputs
   const inputFolderRef = React.useRef<HTMLInputElement>(null);
@@ -71,14 +76,14 @@ const FaceRecognitionInput: React.FC<FaceRecognitionInputProps> = ({
                 type="file" 
                 id="input-folder"
                 multiple
-                accept="image/*"
+                accept="image/*,application/pdf"
                 className="hidden"
                 onChange={handleInputFolderChange}
                 disabled={isProcessing}
               />
               {inputCount !== undefined && (
                 <p className="text-sm text-muted-foreground text-center">
-                  {inputCount} images selected
+                  {inputCount} file{inputCount === 1 ? '' : 's'} selected
                 </p>
               )}
             </div>
@@ -102,20 +107,20 @@ const FaceRecognitionInput: React.FC<FaceRecognitionInputProps> = ({
                 type="file" 
                 id="comparison-folder"
                 multiple
-                accept="image/*"
+                accept="image/*,application/pdf"
                 className="hidden"
                 onChange={handleComparisonFolderChange}
                 disabled={isProcessing}
               />
               {comparisonCount !== undefined && (
                 <p className="text-sm text-muted-foreground text-center">
-                  {comparisonCount} images selected
+                  {comparisonCount} file{comparisonCount === 1 ? '' : 's'} selected
                 </p>
               )}
             </div>
           </div>
 
-          {/* Threshold Input */}
+          {/* Threshold Slider */}
           <div className="md:col-span-2 flex flex-col gap-2">
             <div className="flex items-center gap-1">
               <Label htmlFor="threshold" className="font-medium">Threshold</Label>
@@ -125,22 +130,23 @@ const FaceRecognitionInput: React.FC<FaceRecognitionInputProps> = ({
                     <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help ml-1" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Enter threshold between 0 and 1.<br />Higher values yield stricter matches.</p>
+                    <p>{thresholdTooltip || 'Threshold value between 30 and 100 for face matching confidence.'}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <Input 
-              id="threshold" 
-              type="number" 
-              min="0" 
-              max="1" 
-              step="0.01"
-              value={threshold}
-              onChange={(e) => setThreshold(parseFloat(e.target.value))}
-              className="h-12"
-              disabled={isProcessing}
-            />
+            <div className="flex items-center gap-2">
+              <Slider
+                id="threshold"
+                min={thresholdMin || 30}
+                max={thresholdMax || 100}
+                value={[threshold]}
+                onValueChange={(value) => setThreshold(value[0])}
+                className="h-12"
+                disabled={isProcessing}
+              />
+              <span className="text-sm text-muted-foreground w-12 text-center">{threshold}</span>
+            </div>
           </div>
 
           {/* Action Buttons */}
