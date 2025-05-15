@@ -224,6 +224,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { isAuthenticated } from "@/utils/api";
+import { toast } from "sonner";
+import { useEffect } from 'react';
+import { log } from 'console';
 
 const Navigation = () => {
   const location = useLocation();
@@ -233,7 +236,23 @@ const Navigation = () => {
 
   const isActive = (path: string) => currentPath === path;
   const handleLogin = () => navigate('/login');
-  const authenticated = isAuthenticated();
+  const [authenticated, setAuthenticated] = useState(isAuthenticated());
+
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('access_token_timestamp');
+    setAuthenticated(false); // 👈 Add this
+    toast.success("Logged out successfully");
+    navigate('/login', { replace: true });
+  };
+
+
+  useEffect(() => {
+    console.log(authenticated)
+  }, []);
+  
+
 
   return (
     <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -309,6 +328,18 @@ const Navigation = () => {
                 <span>Login</span>
               </Button>
             )}
+            {authenticated && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleLogout}
+                className="flex items-center gap-2"
+              >
+                <LogIn className="h-4 w-4" />
+                <span>Logout</span>
+              </Button>
+            )}
+            
           </div>
           {/* Mobile menu button */}
           <div className="flex items-center md:hidden">
@@ -347,6 +378,18 @@ const Navigation = () => {
                     <LogIn className="h-4 w-4" /> Login
                   </DropdownMenuItem>
                 )}
+                {
+                  authenticated && (
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        handleLogout(); 
+                      }} 
+                      className="flex items-center gap-2"
+                    >
+                      <LogIn className="h-4 w-4" /> Logout
+                    </DropdownMenuItem>
+                  ) 
+                }
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
