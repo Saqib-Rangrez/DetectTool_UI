@@ -13,7 +13,7 @@ export const useAutoLogout = () => {
     };
 
     const checkInterval = 60 * 1000; // check every minute
-    const maxAge = 30 * 60 * 1000; // 30 minutes in ms
+    const maxAge =60* 60 * 1000; // 30 minutes in ms
 
     const intervalId = setInterval(() => {
       const timestamp = localStorage.getItem('access_token_timestamp');

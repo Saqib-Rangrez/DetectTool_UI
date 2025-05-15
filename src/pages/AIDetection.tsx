@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UploadModal from '@/components/UploadModal';
-import { detectAISingle, detectAIImages } from '@/utils/api';
+import { detectAISingle, detectAIImages, isAuthenticated } from '@/utils/api';
+import { useNavigate } from 'react-router-dom';
 
 type UploadMode = 'single' | 'multiple';
 type DetectionResult = 'ai' | 'human' | 'pending' | null;
@@ -29,11 +30,23 @@ const AIDetection: React.FC = () => {
   const [processedFiles, setProcessedFiles] = useState<ProcessedFile[]>([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Reset processed files when upload mode changes
   useEffect(() => {
     setProcessedFiles([]);
   }, [uploadMode]);
+
+  useEffect(() => {
+      if (!isAuthenticated()) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to access this page",
+          variant: "destructive",
+        });
+        navigate("/login");
+      }
+    }, [navigate, toast]);
 
   const getFileUrl = (file: File): string => {
     return URL.createObjectURL(file);

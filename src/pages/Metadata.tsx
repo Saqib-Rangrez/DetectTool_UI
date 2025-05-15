@@ -277,7 +277,7 @@ const Metadata = () => {
           </div>
 
           <div
-            className="flex-1 overflow-hidden flex items-center justify-center bg-slate-100 p-4 relative max-w-[800px] mx-auto"
+            className="flex-1 overflow-hidden flex items-center justify-center bg-slate-100 py-4 px-2 relative  mx-auto"
             onMouseEnter={() => setShowZoomControls(true)}
             onMouseLeave={() => {
               setShowZoomControls(false);
@@ -303,17 +303,19 @@ const Metadata = () => {
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
               >
+                
                 <img
                   ref={imageRef}
                   src={selectedImage.url}
                   alt={selectedImage.name}
-                  className="max-w-full max-h-full object-contain"
+                  className="w-auto h-auto max-h-[90vh] max-w-full object-contain"
                   style={{
                     transform: `translate(${imagePosition.x}px, ${imagePosition.y}px)`,
                     transition: isDragging ? "none" : "transform 0.3s ease",
                   }}
                   draggable={false}
                 />
+
               </div>
             )}
 
@@ -360,20 +362,20 @@ const Metadata = () => {
             )}
           </div>
 
-          <div className="w-96 border-l overflow-y-auto bg-white shadow-md p-4">
+          <div className="w-[30%] border-l overflow-y-auto bg-white shadow-md p-4">
             <h5 className="mb-4 text-primary border-b pb-3 bg-gray-100 px-3 rounded shadow-sm">
               METADATA Flag Details
             </h5>
             {selectedImage && selectedImage.exifApiData ? (
               <div className="flex flex-col gap-8">
                 {Object.entries(selectedImage.exifApiData).map(([section, pairs]) => (
-                  <div key={section} className="flex flex-col bg-slate-50 rounded-lg p-4 shadow-sm">
+                  <div key={section} className="flex flex-col bg-slate-50 rounded-lg px-2 py-4 shadow-sm">
                     <h6 className="text-primary font-semibold mb-3">{section}</h6>
                     <div className="grid grid-cols-[auto,1fr] gap-x-4 gap-y-2">
                       {pairs.map(([key, value]) => (
                         <React.Fragment key={key}>
                           <span className="text-red-600 font-bold text-sm">{key}</span>
-                          <span className="text-gray-600 text-sm truncate" title={value}>
+                          <span className="text-gray-600 text-sm truncate text-wrap" title={value}>
                             {value || "N/A"}
                           </span>
                         </React.Fragment>
