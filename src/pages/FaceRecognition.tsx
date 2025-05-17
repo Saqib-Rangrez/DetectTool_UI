@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,8 +25,7 @@ import FaceRecognitionInput from '@/components/FaceRecognition/FaceRecognitionIn
 import FaceRecognitionResults from '@/components/FaceRecognition/FaceRecognitionResults';
 import ExportDialog from '@/components/FaceRecognition/ExportDialog';
 import EmptyState from '@/components/FaceRecognition/EmptyState';
-import { compareImages, isAuthenticated } from '@/utils/api';
-import { useNavigate } from 'react-router-dom';
+import { compareImages } from '@/utils/api';
 
 // Types for the face recognition feature
 export interface ImageFile {
@@ -68,19 +67,6 @@ const FaceRecognition: React.FC = () => {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [exportProcessing, setExportProcessing] = useState(false);
   const { toast } = useToast();
-    const navigate = useNavigate();
-  
-
-  useEffect(() => {
-        if (!isAuthenticated()) {
-          toast({
-            title: "Authentication required",
-            description: "Please log in to access this page",
-            variant: "destructive",
-          });
-          navigate("/login");
-        }
-      }, [navigate, toast]);
 
   const handleInputFolderSelect = useCallback((files: FileList) => {
     const validFiles: ImageFile[] = Array.from(files)
@@ -143,7 +129,6 @@ const FaceRecognition: React.FC = () => {
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    let intervalId: NodeJS.Timeout | null = null;
     if (!inputFolder || !comparisonFolder) {
       toast({
         title: "Missing folders",
@@ -160,103 +145,116 @@ const FaceRecognition: React.FC = () => {
       total: inputFolder.length,
       progressPercent: 0
     });
-    setResults(null);
-    setSelectedImage(null); // Clear selectedImage to avoid stale state
+    setResults([]);
+    setSelectedImage(null);
+
+    let totalMatches = 0;
+    const errorMessages: string[] = [];
 
     try {
-      // Simulate per-file progress
-      let currentFile = 0;
-      const totalFiles = inputFolder.length;
-      const intervalDuration = Math.max(500, 10000 / totalFiles); // 500ms per file, capped at 10s total
-      let intervalId: NodeJS.Timeout | null = null;
+      // Process each input image one at a time
+      for (let i = 0; i < inputFolder.length; i++) {
+        const inputImg = inputFolder[i];
+        const inputFile = [inputImg.file];
+        const compareFiles = comparisonFolder.map(img => img.file);
 
-      const updateProgress = () => {
-        currentFile = Math.min(currentFile + 1, totalFiles);
-        const progress = (currentFile / totalFiles) * 100;
-        setProcessingStatus({
-          isProcessing: true,
-          current: currentFile,
-          total: totalFiles,
-          progressPercent: progress
-        });
-        if (currentFile >= totalFiles && intervalId) {
-          clearInterval(intervalId);
-          intervalId = null;
+        try {
+          // Call API for one input image
+          const response = await compareImages(inputFile, compareFiles, threshold);
+
+          // Process matches for this input image
+          const matches = response.matches
+            .filter(match => match.input_file === inputImg.name && match.matched)
+            .map(match => {
+              const compareImg = comparisonFolder.find(img => img.name === match.compare_file);
+              return {
+                id: compareImg?.id || `match-${Math.random().toString(36).substring(2, 11)}`,
+                name: match.compare_file,
+                url: compareImg?.url || '',
+                score: match.result,
+                distance: match.distance
+              };
+            });
+
+          // Append to results
+          const newResult = {
+            ...inputImg,
+            matches
+          };
+
+          setResults(prev => {
+            const updatedResults = [...(prev || []), newResult];
+            // Set selectedImage to this result if it has matches
+            if (matches.length > 0) {
+              setSelectedImage(newResult);
+            }
+            return updatedResults;
+          });
+
+          totalMatches += matches.length;
+          if (response.errors.length > 0) {
+            errorMessages.push(...response.errors);
+          }
+
+          // Update progress
+          setProcessingStatus({
+            isProcessing: true,
+            current: i + 1,
+            total: inputFolder.length,
+            progressPercent: ((i + 1) / inputFolder.length) * 100
+          });
+
+          // Show toast for this image's completion
+          toast({
+            title: `Processed ${inputImg.name}`,
+            description: `${matches.length} match${matches.length === 1 ? '' : 'es'} found.`,
+            duration: 3000
+          });
+        } catch (error) {
+          console.error(`Error processing ${inputImg.name}:`, error);
+          errorMessages.push(inputImg.name);
+          // Still append the image with no matches to maintain result order
+          setResults(prev => [...(prev || []), { ...inputImg, matches: [] }]);
+          setProcessingStatus({
+            isProcessing: true,
+            current: i + 1,
+            total: inputFolder.length,
+            progressPercent: ((i + 1) / inputFolder.length) * 100
+          });
         }
-      };
-
-      intervalId = setInterval(updateProgress, intervalDuration);
-
-      // Run API call in parallel
-      const inputFiles = inputFolder.map(img => img.file);
-      const compareFiles = comparisonFolder.map(img => img.file);
-      const response = await compareImages(inputFiles, compareFiles, threshold);
-
-      // Ensure progress reaches 100% on API completion
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
       }
+
+      // Complete processing
       setProcessingStatus({
         isProcessing: false,
-        current: totalFiles,
-        total: totalFiles,
+        current: inputFolder.length,
+        total: inputFolder.length,
         progressPercent: 100
       });
 
-      // Process API response
-      const resultsWithMatches = inputFolder.map(inputImg => {
-        const matches = response.matches
-          .filter(match => match.input_file === inputImg.name && match.matched)
-          .map(match => {
-            const compareImg = comparisonFolder.find(img => img.name === match.compare_file);
-            return {
-              id: compareImg?.id || `match-${Math.random().toString(36).substring(2, 11)}`,
-              name: match.compare_file,
-              url: compareImg?.url || '',
-              score: match.result,
-              distance: match.distance
-            };
-          });
+      // Reset form
+      setInputFolder(null);
+      setComparisonFolder(null);
+      setThreshold(30);
 
-        return {
-          ...inputImg,
-          matches
-        };
-      });
-
-      // Filter to only files with matches
-      const filteredResults = resultsWithMatches.filter(img => img.matches && img.matches.length > 0);
-
-      setResults(filteredResults);
-      if (filteredResults.length > 0) {
-        setSelectedImage(filteredResults[0]);
-        setInputFolder(null);
-        setComparisonFolder(null);
-        setThreshold(30);
-      }
-
+      // Show completion toast
       toast({
         title: "Processing complete",
-        description: `Found ${response.total_matches} matches for ${filteredResults.length} out of ${inputFolder.length} file${inputFolder.length === 1 ? '' : 's'}.`
+        description: `Found ${totalMatches} matches for ${results?.length || 0} out of ${inputFolder.length} file${inputFolder.length === 1 ? '' : 's'}.`
       });
 
-      if (response.errors.length > 0) {
+      if (errorMessages.length > 0) {
         toast({
           title: "Processing errors",
-          description: `${response.errors.length} file${response.errors.length === 1 ? '' : 's'} could not be processed: ${response.errors.join(', ')}`,
+          description: `${errorMessages.length} file${errorMessages.length === 1 ? '' : 's'} could not be processed: ${errorMessages.join(', ')}`,
           variant: "destructive"
         });
       }
     } catch (error) {
-      console.error('Error comparing files:', error);
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
+      console.error('Error during processing:', error);
       toast({
         title: "Error",
-        description: `Failed to compare files: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        description: `Failed to process files: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive"
       });
       setProcessingStatus({
@@ -266,9 +264,9 @@ const FaceRecognition: React.FC = () => {
         progressPercent: 0
       });
       setResults(null);
-      setSelectedImage(null); // Clear on error
+      setSelectedImage(null);
     }
-  }, [inputFolder, comparisonFolder, threshold, toast]);
+  }, [inputFolder, comparisonFolder, threshold, toast, selectedImage, results]);
 
   const handleExport = useCallback(() => {
     setShowExportDialog(true);
@@ -303,7 +301,7 @@ const FaceRecognition: React.FC = () => {
             input.matches ? input.matches.map(match => [
               `"${input.name.replace(/"/g, '""')}"`,
               `"${match.name.replace(/"/g, '""')}"`,
-              'true', // Only matched results are included
+              'true',
               match.distance.toFixed(2),
               threshold.toFixed(2),
               match.score.toFixed(2)
@@ -347,7 +345,7 @@ const FaceRecognition: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full">
+      <div className="flex-1 p-4 md:p-6 max-w-full mx-auto w-full">
         {/* Input Section */}
         <FaceRecognitionInput 
           threshold={threshold}
@@ -389,34 +387,28 @@ const FaceRecognition: React.FC = () => {
         )}
         
         {/* Results Section */}
-        {!showEmptyState ? (
-          <>
-            {!processingStatus.isProcessing && (
-              <div className="mt-6">
-                {results && results.length > 0 ? (
-                  <FaceRecognitionResults 
-                    results={results}
-                    selectedImage={selectedImage}
-                    onImageSelect={handleImageSelect}
-                    threshold={threshold}
-                  />
-                ) : !processingStatus.isProcessing && inputFolder && comparisonFolder && (
-                  <Card className="bg-white p-6 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <ArrowRight className="h-10 w-10 text-muted-foreground mb-2" />
-                      <h3 className="text-lg font-medium">Ready to Process</h3>
-                      <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                        Both input and comparison folders are ready. Click the "Submit" button above to start the face recognition process.
-                      </p>
-                    </div>
-                  </Card>
-                )}
+        <div className="mt-6">
+          {results && results.length > 0 ? (
+            <FaceRecognitionResults 
+              results={results}
+              selectedImage={selectedImage}
+              onImageSelect={handleImageSelect}
+              threshold={threshold}
+            />
+          ) : inputFolder && comparisonFolder && !processingStatus.isProcessing ? (
+            <Card className="bg-white p-6 text-center">
+              <div className="flex flex-col items-center gap-2">
+                <ArrowRight className="h-10 w-10 text-muted-foreground mb-2" />
+                <h3 className="text-lg font-medium">Ready to Process</h3>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  Both input and comparison folders are ready. Click the "Submit" button above to start the face recognition process.
+                </p>
               </div>
-            )}
-          </>
-        ) : (
-          <EmptyState />
-        )}
+            </Card>
+          ) : showEmptyState ? (
+            <EmptyState />
+          ) : null}
+        </div>
       </div>
       
       {/* Export Dialog */}
