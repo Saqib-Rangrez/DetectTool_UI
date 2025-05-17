@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -21,6 +21,8 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
   threshold
 }) => {
   const [activeView, setActiveView] = useState<'grid' | 'split'>('split');
+  const inputPanelRef = useRef<HTMLDivElement>(null);
+const [showAllMatches, setShowAllMatches] = React.useState<{ [key: string]: boolean }>({});
 
   // Helper to check if file is a PDF
   const isPdf = (name: string) => name.toLowerCase().endsWith('.pdf');
@@ -37,6 +39,16 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
     if (name.length <= maxLength) return name;
     return `${name.slice(0, maxLength - 3)}...`;
   };
+
+  // Scroll to the latest result
+  useEffect(() => {
+    if (results.length > 0 && inputPanelRef.current) {
+      const latestResultElement = inputPanelRef.current.querySelector(`[data-id="${results[results.length - 1].id}"]`);
+      if (latestResultElement) {
+        latestResultElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }, [results]);
 
   // Find matched files for the selected file
   const matchedFiles = selectedImage?.matches || [];
@@ -57,18 +69,19 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
           <ResizablePanelGroup direction="horizontal" className="min-h-[600px] rounded-lg border">
             {/* Input Files Panel */}
             <ResizablePanel defaultSize={40} minSize={30}>
-              <div className="flex flex-col h-full bg-white">
+              <div className="flex flex-col h-full bg-white" ref={inputPanelRef}>
                 <div className="p-4 border-b bg-slate-50">
                   <h3 className="font-medium">Input Files ({results.length})</h3>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4">
                   <div className="grid grid-cols-2 gap-4">
-                    {results.map((file) => (
+                    {results.map((file, index) => (
                       <div 
                         key={file.id}
+                        data-id={file.id}
                         className={`relative rounded-md overflow-hidden border-2 transition-all cursor-pointer hover:shadow-md ${
                           selectedImage?.id === file.id ? 'border-primary shadow-md' : 'border-transparent'
-                        }`}
+                        } ${index === results.length - 1 ? 'animate-pulse-bg' : ''}`}
                         onClick={() => onImageSelect(file)}
                       >
                         {isPdf(file.name) ? (
@@ -168,7 +181,7 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
                                 <img 
                                   src={match.url} 
                                   alt={match.name} 
-                                  className="w-full h-full object-contain bg-gray-100"
+                                  className="w-full h-52 object-fill bg-gray-100"
                                 />
                               )}
                               <div className="absolute top-3 right-3">
@@ -236,12 +249,15 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
           </ResizablePanelGroup>
         </TabsContent>
 
-        <TabsContent value="grid" className="mt-4">
+        {/* <TabsContent value="grid" className="mt-4">
           <Card>
             <CardContent className="p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {results.map((file) => (
-                  <Card key={file.id} className="overflow-hidden hover:shadow-md transition-shadow flex flex-col h-[400px]">
+                {results.map((file, index) => (
+                  <Card 
+                    key={file.id} 
+                    className={`overflow-hidden hover:shadow-md transition-shadow flex flex-col h-[400px] ${index === results.length - 1 ? 'animate-pulse-bg' : ''}`}
+                  >
                     <div className="p-4 border-b bg-slate-50">
                       <TooltipProvider>
                         <Tooltip>
@@ -276,7 +292,7 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
                           <img 
                             src={file.url} 
                             alt={file.name} 
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-fill"
                           />
                         )}
                         <div className="absolute top-2 right-2">
@@ -286,7 +302,7 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
                         </div>
                       </div>
                       
-                      {file.matches && file.matches?.length > 0 ? (
+                      {file.matches && file.matches.length > 0 ? (
                         <div className="space-y-2 flex-grow">
                           <h5 className="text-sm font-medium">Matches:</h5>
                           {file.matches.slice(0, 2).map((match) => (
@@ -341,10 +357,182 @@ const FaceRecognitionResults: React.FC<FaceRecognitionResultsProps> = ({
               </div>
             </CardContent>
           </Card>
+        </TabsContent> */}
+        
+        <TabsContent value="grid" className="mt-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {results.map((file, index) => (
+                  <Card 
+                    key={file.id} 
+                    className={`overflow-hidden hover:shadow-md transition-shadow flex flex-col h-[400px] ${index === results.length - 1 ? 'animate-pulse-bg' : ''}`}
+                  >
+                    <div className="p-4 border-b bg-slate-50">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <h4 className="font-medium truncate">{truncateName(file.name)}</h4>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{file.name}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <div className="flex flex-col min-h-0">
+                      <div className="relative h-[200px] overflow-hidden">
+                        {isPdf(file.name) ? (
+                          <div
+                            className="w-full h-full bg-gray-100 flex flex-col items-center justify-center text-gray-500 text-sm"
+                          >
+                            <span className="font-medium text-gray-700">PDF</span>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="text-xs truncate max-w-full">{truncateName(file.name)}</span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{file.name}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        ) : (
+                          <img 
+                            src={file.url} 
+                            alt={file.name} 
+                            className="w-full h-full object-contain bg-gray-100"
+                          />
+                        )}
+                        <div className="absolute top-2 right-2">
+                          <Badge className="bg-green-600">
+                            <span className="text-xs">{file.matches?.length || 0} match{file.matches?.length === 1 ? '' : 'es'}</span>
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="p-2 flex flex-col min-h-0">
+                        {file.matches && file.matches.length > 0 ? (
+                          <div className="flex flex-col min-h-0">
+                            <h5 className="text-sm font-medium mb-1">Matches:</h5>
+                            <div className={`flex flex-col gap-1 ${showAllMatches[file.id] ? 'max-h-[100px] overflow-y-auto' : ''}`}>
+                              {file.matches.slice(0, showAllMatches[file.id] ? file.matches.length : 2).map((match) => (
+                                <div key={match.id} className="flex items-start gap-2 bg-slate-50 p-1 rounded">
+                                  <div className="w-20 h-10 shrink-0 rounded transition-transform hover:scale-105">
+                                    {isPdf(match.name) ? (
+                                      <div
+                                        className="w-full h-full bg-gray-100 flex flex-col items-center justify-center text-gray-500 text-xs"
+                                      >
+                                        <span className="font-medium text-gray-700">PDF</span>
+                                        <span className="text-[8px] truncate">{truncateName(match.name, 10)}</span>
+                                      </div>
+                                    ) : (
+                                      <img 
+                                        src={match.url} 
+                                        alt={match.name} 
+                                        className="w-full h-full object-contain bg-gray-100"
+                                      />
+                                    )}
+                                  </div>
+                                  <div className=" flex flex-row justify-between w-full">                          
+
+                                    <div className="min-w-0 flex-1 flex flex-col">
+                                      <TooltipProvider>
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <p className="text-xs truncate ml-2">{truncateName(match.name)}</p>
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <p>{match.name}</p>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      </TooltipProvider>
+                                      <Badge className={`text-[10px] ${getMatchScoreColor(match.score)} w-fit`}>
+                                        {`Score : ${(match.score).toFixed(2)}` }
+                                      </Badge>
+                                    </div>
+
+                                    <div className="min-w-0 flex-1 flex flex-col">
+                                      <TooltipProvider>
+                                          <Tooltip>
+                                            <TooltipTrigger asChild>
+                                              <p className="text-xs truncate ml-2">{`Distnace : ${(match.distance).toFixed(2)}`}</p>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                              <p>{match.distance}</p>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        </TooltipProvider>
+                                        <Badge className={`text-[10px] ${getMatchScoreColor(threshold)} w-fit`}>
+                                          { `Threshold : ${(threshold).toFixed(2)}` }
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                  {/* <div className="min-w-0 flex-1 flex flex-col">
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <p className="text-xs truncate">{truncateName(match.name)}</p>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>{match.name}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                    <Badge className={`text-[10px] ${getMatchScoreColor(match.score)} w-fit`}>
+                                      {(match.score).toFixed(2)}
+                                    </Badge>
+                                  </div> */}
+                                </div>
+                              ))}
+                            </div>
+                            {file.matches.length > 2 && (
+                              <div className="text-center mt-1">
+                                <button
+                                  className="text-xs text-primary hover:underline"
+                                  onClick={() => setShowAllMatches(prev => ({
+                                    ...prev,
+                                    [file.id]: !prev[file.id]
+                                  }))}
+                                >
+                                  {showAllMatches[file.id] ? 'Show Less' : `Show All (+${file.matches.length - 2} more)`}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex-grow flex items-center justify-center">
+                            <p className="text-sm text-muted-foreground">No matches found</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
+      
+      
       </Tabs>
     </div>
   );
 };
+
+// Add CSS for pulse background animation
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+  @keyframes pulse-bg {
+    0% { background-color: #f0fdf4; }
+    50% { background-color: #dcfce7; }
+    100% { background-color: #f0fdf4; }
+  }
+  .animate-pulse-bg {
+    animation: pulse-bg 1.5s ease-in-out;
+  }
+`;
+document.head.appendChild(styleSheet);
 
 export default FaceRecognitionResults;
