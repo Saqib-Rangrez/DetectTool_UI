@@ -30,8 +30,8 @@ interface MultiAIDetectionResponse {
 }
 
 interface CompareImagesResponse {
-  input_files: string[];
-  compare_files: string[];
+  // input_files: string[];
+  // compare_files: string[];
   threshold: number;
   total_matches: number;
   matches: {
@@ -43,6 +43,18 @@ interface CompareImagesResponse {
     result: number;
   }[];
   errors: string[];
+}
+
+export interface ImageStatsResponse {
+  imageUrl: string; 
+  filename: string; 
+  stats: {
+    blue: number; 
+    green: number; 
+    red: number; 
+  };
+  mode: string; 
+  inclusive: boolean;
 }
 
 // ==========================
@@ -230,3 +242,61 @@ export const compareImages = async (
 
   return response.json();
 };
+
+
+
+
+// ==========================
+// API: Image Stats
+// ==========================
+
+export async function fetchImageStats(
+  image: File,
+  mode: string,
+  inclusive: boolean,
+): Promise<ImageStatsResponse> {
+  const formData = new FormData();
+  formData.append("image", image);
+  const token = getAuthToken();
+
+  // Construct URL with query parameters
+  const url = new URL(`${API_BASE_URL}${ENDPOINTS.IMAGE_STATISTICS}`);
+  url.searchParams.append("mode", mode);
+  url.searchParams.append("inclusive", inclusive.toString());
+
+  try {
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accept: "application/json",
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to fetch image stats: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Convert base64 image to data URL
+    const imageUrl = `data:image/${data.filename.split('.').pop()};base64,${data.image}`;
+
+    return {
+      imageUrl,
+      filename: data.filename,
+      stats: {
+        blue: data.stats.blue,
+        green: data.stats.green,
+        red: data.stats.red,
+      },
+      mode: data.mode,
+      inclusive: data.inclusive,
+    };
+  } catch (error) {
+    console.error("Error fetching image stats:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to process image stats");
+  }
+}

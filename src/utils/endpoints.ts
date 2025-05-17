@@ -4,4 +4,5 @@ export const ENDPOINTS = {
   DETECT_AI_SINGLE: '/detect-ai-single',
   DETECT_AI_IMAGES: '/detect-ai-images',
   COMPARE_FACES: '/compare-faces',
+  IMAGE_STATISTICS: '/image-stats',
 };
