@@ -268,7 +268,7 @@ const Navigation = () => {
               />              
             </Link>
             {/* Desktop Navigation */}
-            <div className="hidden md:ml-6 md:flex">
+            <div className="hidden md:ml-0 md:flex">
               <NavigationMenu className="px-4">
                 <NavigationMenuList>
                   <NavigationMenuItem>
@@ -311,6 +311,26 @@ const Navigation = () => {
                       </NavigationMenuLink>
                     </Link>
                   </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <Link to="/pixel-statistics">
+                      <NavigationMenuLink className={cn(
+                        navigationMenuTriggerStyle(),
+                        isActive('/pixel-statistics') && 'bg-accent text-accent-foreground'
+                      )}>
+                        <Users className="h-4 w-4 mr-2" /> Pixel Statistics
+                      </NavigationMenuLink>
+                    </Link>
+                  </NavigationMenuItem>
+                  {/* <NavigationMenuItem>
+                    <Link to="/copy-move-forgery">
+                      <NavigationMenuLink className={cn(
+                        navigationMenuTriggerStyle(),
+                        isActive('/copy-move-forgery') && 'bg-accent text-accent-foreground'
+                      )}>
+                        <Users className="h-4 w-4 mr-2" /> Copy-Move Forgery
+                      </NavigationMenuLink>
+                    </Link>
+                  </NavigationMenuItem> */}
                 </NavigationMenuList>
               </NavigationMenu>
             </div>

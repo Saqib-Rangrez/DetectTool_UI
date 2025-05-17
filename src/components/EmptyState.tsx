@@ -3,11 +3,15 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 
-interface EmptyStateProps {
+interface EmptyStateProps {  
+  icon : string;
+  title: string;
+  description: string;
+  className ?: string;
   onUploadClick: () => void;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({ onUploadClick }) => {
+const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, description, onUploadClick }) => {
   return (
     <div className="h-full flex flex-col items-center justify-center p-8 bg-slate-50">
       <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4 shadow-inner animate-pulse">

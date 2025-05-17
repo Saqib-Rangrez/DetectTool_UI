@@ -246,7 +246,11 @@ const Metadata = () => {
       </div>
 
       {images.length === 0 ? (
-        <EmptyState onUploadClick={() => setUploadModalOpen(true)} />
+        <EmptyState 
+        icon=""
+        title="No Images Uploaded"
+        description="Upload images to view and extract metadata."
+        onUploadClick={() => setUploadModalOpen(true)} />
       ) : (
         <div className="flex flex-1 overflow-hidden">
           <div className="w-44 border-r overflow-y-auto p-2 bg-slate-50">

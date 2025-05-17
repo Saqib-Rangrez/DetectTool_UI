@@ -144,7 +144,7 @@ const AIDetection: React.FC = () => {
         const progressInterval = setInterval(() => {
           progress = Math.min(progress + 10, 80);
           setProcessingProgress(progress);
-        }, 200);
+        }, 10);
 
         const apiResponse = await detectAIImages(files.map(f => f.file));
         clearInterval(progressInterval);
@@ -293,7 +293,7 @@ const AIDetection: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 p-4 md:p-6 max-w-6xl mx-auto w-full">
+      <div className="flex-1 p-4 md:p-6 mx-auto w-full">
         {/* Main Content Card */}
         <Card className="bg-white overflow-hidden shadow-md">
           <CardContent className="p-6">
@@ -462,7 +462,7 @@ const AIDetection: React.FC = () => {
                             <img 
                               src={file.url} 
                               alt="Analyzed image" 
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-fill"
                             />
                             {file.result && file.result !== 'pending' && (
                               <Badge 
