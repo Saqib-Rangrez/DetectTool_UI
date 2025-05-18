@@ -14,28 +14,27 @@ export async function fetchCopyMoveDetection(
     hide_lines: boolean;
     use_mask: boolean;
     mask?: File;
-  }
+  },
+  toast: (options: { title: string; description: string }) => void // Add toast as a parameter
 ): Promise<CopyMoveDetectionResponse> {
   const formData = new FormData();
   formData.append("image", image);
+  formData.append("detector", params.detector);
+  formData.append("response_threshold", params.response_threshold.toString());
+  formData.append("matching_threshold", params.matching_threshold.toString());
+  formData.append("distance_threshold", params.distance_threshold.toString());
+  formData.append("cluster_size", params.cluster_size.toString());
+  formData.append("hide_lines", params.hide_lines.toString());
+  formData.append("use_mask", params.use_mask.toString());
+  if (params.show_keypoints !== undefined) {
+    formData.append("show_keypoints", params.show_keypoints.toString());
+  }
   if (params.use_mask && params.mask) {
     formData.append("mask", params.mask);
   }
-  // const token = getAuthToken();
-  const url = new URL(`${API_BASE_URL}${ENDPOINTS.DETECT_COPY_MOVE}`);
-  url.searchParams.append("detector", params.detector);
-  url.searchParams.append("response_threshold", params.response_threshold.toString());
-  url.searchParams.append("matching_threshold", params.matching_threshold.toString());
-  url.searchParams.append("distance_threshold", params.distance_threshold.toString());
-  url.searchParams.append("cluster_size", params.cluster_size.toString());
-  if (params.show_keypoints !== undefined) {
-    url.searchParams.append("show_keypoints", params.show_keypoints.toString());
-  }
-  url.searchParams.append("hide_lines", params.hide_lines.toString());
-  url.searchParams.append("use_mask", params.use_mask.toString());
 
   try {
-    const response = await fetch(url.toString(), {
+    const response = await fetch(`${API_BASE_URL}${ENDPOINTS.DETECT_COPY_MOVE}`, {
       method: "POST",
       headers: getAuthHeaders(),
       body: formData,
@@ -43,13 +42,23 @@ export async function fetchCopyMoveDetection(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Failed to fetch copy-move detection: ${response.status}`);
+      const errorMessage = errorData.message || `Failed to fetch copy-move detection: ${response.status}`;
+      toast({
+        title: "Analysis Failed",
+        description: errorMessage,
+      });
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
     
     // Convert base64 result_image to data URL (assume PNG based on input example)
     const imageUrl = `data:image/png;base64,${data.result_image}`;
+
+    toast({
+      title: "Analysis Complete",
+      description: "Image analyzed successfully",
+    });
 
     return {
       total_keypoints: data.total_keypoints,
@@ -62,6 +71,11 @@ export async function fetchCopyMoveDetection(
     };
   } catch (error) {
     console.error("Error fetching copy-move detection:", error);
-    throw new Error(error instanceof Error ? error.message : "Failed to process copy-move detection");
+    const errorMessage = error instanceof Error ? error.message : "Failed to process copy-move detection";
+    toast({
+      title: "Analysis Failed",
+      description: errorMessage,
+    });
+    throw new Error(errorMessage);
   }
 }

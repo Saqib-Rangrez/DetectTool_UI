@@ -91,7 +91,7 @@ const CopyMoveForgery: React.FC = () => {
           hide_lines: hideLines,
           use_mask: useMask,
           mask: maskFile,
-        });
+        }, toast);
         const mappedResult: ForgeryScanResults = {
           keypoints: result.total_keypoints,
           filtered: result.filtered_keypoints,
