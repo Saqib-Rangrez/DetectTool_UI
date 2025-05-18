@@ -321,7 +321,7 @@ const Navigation = () => {
                       </NavigationMenuLink>
                     </Link>
                   </NavigationMenuItem>
-                  {/* <NavigationMenuItem>
+                  <NavigationMenuItem>
                     <Link to="/copy-move-forgery">
                       <NavigationMenuLink className={cn(
                         navigationMenuTriggerStyle(),
@@ -330,7 +330,7 @@ const Navigation = () => {
                         <Users className="h-4 w-4 mr-2" /> Copy-Move Forgery
                       </NavigationMenuLink>
                     </Link>
-                  </NavigationMenuItem> */}
+                  </NavigationMenuItem>
                 </NavigationMenuList>
               </NavigationMenu>
             </div>

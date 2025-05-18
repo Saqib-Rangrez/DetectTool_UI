@@ -216,9 +216,9 @@ const [showAllMatches, setShowAllMatches] = React.useState<{ [key: string]: bool
                                   <span>Threshold: {threshold.toFixed(2)}</span>
                                   <span>Score: {(match.score).toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between mt-1 text-xs text-gray-500">
+                                {/* <div className="flex justify-between mt-1 text-xs text-gray-500">
                                   <span>Distance: {match.distance.toFixed(2)}</span>
-                                </div>
+                                </div> */}
                               </div>
                             </CardContent>
                           </Card>
@@ -418,7 +418,7 @@ const [showAllMatches, setShowAllMatches] = React.useState<{ [key: string]: bool
                             <h5 className="text-sm font-medium mb-1">Matches:</h5>
                             <div className={`flex flex-col gap-1 ${showAllMatches[file.id] ? 'max-h-[100px] overflow-y-auto' : ''}`}>
                               {file.matches.slice(0, showAllMatches[file.id] ? file.matches.length : 2).map((match) => (
-                                <div key={match.id} className="flex items-start gap-2 bg-slate-50 p-1 rounded">
+                                <div key={match.id} className="flex items-start gap-2 justify-between bg-slate-50 p-1 rounded">
                                   <div className="w-20 h-10 shrink-0 rounded transition-transform hover:scale-105">
                                     {isPdf(match.name) ? (
                                       <div
@@ -454,7 +454,7 @@ const [showAllMatches, setShowAllMatches] = React.useState<{ [key: string]: bool
                                     </div>
 
                                     <div className="min-w-0 flex-1 flex flex-col">
-                                      <TooltipProvider>
+                                      {/* <TooltipProvider>
                                           <Tooltip>
                                             <TooltipTrigger asChild>
                                               <p className="text-xs truncate ml-2">{`Distnace : ${(match.distance).toFixed(2)}`}</p>
@@ -463,10 +463,10 @@ const [showAllMatches, setShowAllMatches] = React.useState<{ [key: string]: bool
                                               <p>{match.distance}</p>
                                             </TooltipContent>
                                           </Tooltip>
-                                        </TooltipProvider>
-                                        <Badge className={`text-[10px] ${getMatchScoreColor(threshold)} w-fit`}>
+                                        </TooltipProvider> */}
+                                        {/* <Badge className={`text-[10px] ${getMatchScoreColor(threshold)} w-fit`}>
                                           { `Threshold : ${(threshold).toFixed(2)}` }
-                                        </Badge>
+                                        </Badge> */}
                                       </div>
                                     </div>
                                   {/* <div className="min-w-0 flex-1 flex flex-col">

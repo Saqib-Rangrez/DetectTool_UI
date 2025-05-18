@@ -14,7 +14,7 @@ import Navigation from "./components/Navigation";
 import { useAutoLogout } from '@/hooks/useAutoLogout';
 import { AutoLogoutHandler } from "./components/AutoLogoutHandler";
 import PixelStatistics from "./pages/PixelStatistics";
-// import CopyMoveForgery from "./pages/CopyMoveForgery";
+import CopyMoveForgery from "./pages/CopyMoveForgery";
 
 // Add Inter font import
 const interFontLink = document.createElement('link');
@@ -50,7 +50,7 @@ const App = () => {
                         <Route path="/face-recognition" element={<FaceRecognition />} />
                         <Route path="/pixel-statistics" element={<PixelStatistics />} />
                         <Route path="/pixel-statistics" element={<PixelStatistics />} />
-                        {/* <Route path="/copy-move-forgery" element={<CopyMoveForgery />} /> */}
+                        <Route path="/copy-move-forgery" element={<CopyMoveForgery />} />
 
                         <Route path="*" element={<NotFound />} />
                       </Routes>
