@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +26,11 @@ import { Loader, Info, Download, ChevronRight } from "lucide-react";
 import ImageViewer from "../components/copy-move-forgery/ImageViewer";
 import ParameterControl from "../components/copy-move-forgery/ParameterControl";
 import ResultsPanel from "../components/copy-move-forgery/ResultsPanel";
-import { fetchCopyMoveDetection } from "../utils/api";
+// import { fetchCopyMoveDetection, isAuthenticated } from "../utils/api";
+import { fetchCopyMoveDetection } from "@/api/services/copyMove";
+import { isAuthenticated } from "@/api/auth";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 type DetectorType = "BRISK" | "ORB" | "AKAZE" | null;
 
@@ -58,11 +62,21 @@ const CopyMoveForgery: React.FC = () => {
     queryKey: ["forgeryDetection"],
     queryFn: async () => {
       if (!imageFile || !detector) {
-        toast.error("Please upload an image and select a detector");
+        // toast.error("Please upload an image and select a detector");
+        toast({
+        title: "Image and algorithm required",
+        description: "Please upload an image and select a detector",
+        variant: "destructive",
+      });
         return null;
       }
       if (useMask && !maskFile) {
-        toast.error("Please upload a mask image when mask is enabled");
+        // toast.error("Please upload a mask image when mask is enabled");
+        toast({
+          title: "Mask image required",
+          description: "Please upload a mask image when mask is enabled",
+          variant: "destructive",
+        });
         return null;
       }
 
@@ -89,13 +103,32 @@ const CopyMoveForgery: React.FC = () => {
         setResults(mappedResult);
         return mappedResult;
       } catch (error) {
-        toast.error("Failed to process image. Please try again.");
+        toast({
+          title: "Error!",
+          description: "Failed to process image. Please try again.",
+          variant: "destructive",
+        });
+        // toast.error("Failed to process image. Please try again.");
         console.error(error);
         return null;
       }
     },
     enabled: false, // Don't run automatically
   });
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to access this page",
+        variant: "destructive",
+      });
+      navigate("/login");
+    }
+  }, [navigate, toast]);
 
   const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -133,7 +166,12 @@ const CopyMoveForgery: React.FC = () => {
 
   const handleSubmit = () => {
     if (!detector) {
-      toast.error("Please select a detector algorithm");
+      toast({
+        title: "Detector Algorithm is required",
+        description: "Please select a detector algorithm",
+        variant: "destructive",
+      });
+      // toast.error("Please select a detector algorithm");
       return;
     }
     refetch();
@@ -148,7 +186,12 @@ const CopyMoveForgery: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success("Image downloaded successfully");
+    // toast.success("Image downloaded successfully");
+    toast({
+        title: "Success!",
+        description: "Image downloaded successfully",
+        variant: "default",
+      });
   };
 
   const detectorOptions = [

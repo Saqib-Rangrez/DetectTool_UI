@@ -214,9 +214,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
                       multiple
                       accept="image/*,application/pdf"
                       className="hidden"
-                      webkitdirectory={true}
+                      // webkitdirectory={true}
                       // mozdirectory="true"
-                      directory={true}
+                      // directory={true}
                       onChange={handleFilesSelected}
                     />
                   </div>
@@ -265,9 +265,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
                     multiple
                     accept="image/*,application/pdf"
                     className="hidden"
-                    webkitdirectory={true}
+                    // webkitdirectory={true}
                     // mozdirectory="true"
-                    directory={true}
+                    // directory={true}
                     onChange={handleFilesSelected}
                   />
                 </div>

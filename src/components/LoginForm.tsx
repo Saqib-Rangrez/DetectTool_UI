@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { loginUser } from '@/api/auth';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -13,65 +14,44 @@ const LoginForm: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
 
-    if (!email || !password) {
-      toast({
-        title: "Error",
-        description: "Email and password are required",
-        variant: "destructive",
-      });
-      return;
-    }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    setIsLoading(true);
+  if (!email || !password) {
+    toast({
+      title: "Error",
+      description: "Email and password are required",
+      variant: "destructive",
+    });
+    return;
+  }
 
-    try {
-      // Create query parameters (mimics Angular's ?email=...&password=...)
-      const queryParams = new URLSearchParams({
-        email,
-        password,
-      });
+  setIsLoading(true);
 
-      const response = await fetch(`http://127.0.0.1:8000/login?${queryParams.toString()}`, {
-        method: "POST",
-        headers: {
-          // No Content-Type needed since we're not sending a body
-        },
-        // No body needed, as parameters are in the query string
-      });
+  try {
+    const data = await loginUser({ email, password });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Login failed: ${response.statusText} (${errorText})`);
-      }
+    localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("access_token_timestamp", Date.now().toString());
 
-      const data = await response.json();
+    toast({
+      title: "Success",
+      description: "You have successfully logged in",
+    });
 
-      // Store the access token in localStorage
-      localStorage.setItem("access_token", data.access_token);
-      localStorage.setItem("access_token_timestamp", Date.now().toString());
-      
-
-      toast({
-        title: "Success",
-        description: "You have successfully logged in",
-      });
-
-      // Redirect to the main page after login
-      navigate("/");
-    } catch (error) {
-      console.error("Login error:", error);
-      toast({
-        title: "Login Failed",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    navigate("/");
+  } catch (error) {
+    console.error("Login error:", error);
+    toast({
+      title: "Login Failed",
+      description: error instanceof Error ? error.message : "An unknown error occurred",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">

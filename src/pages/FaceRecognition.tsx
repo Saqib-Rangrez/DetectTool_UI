@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,14 +25,17 @@ import FaceRecognitionInput from '@/components/FaceRecognition/FaceRecognitionIn
 import FaceRecognitionResults from '@/components/FaceRecognition/FaceRecognitionResults';
 import ExportDialog from '@/components/FaceRecognition/ExportDialog';
 import EmptyState from '@/components/FaceRecognition/EmptyState';
-import { compareImages } from '@/utils/api';
+// import { compareImages } from '@/utils/api';
+import { compareImages } from '@/api/services/compareFaces';
+import { isAuthenticated } from '@/api/auth';
+import { useNavigate } from 'react-router-dom';
 
 // Types for the face recognition feature
 export interface ImageFile {
   id: string;
   name: string;
   url: string;
-  file: File; // Store original File object
+  file: File; 
   matches?: Match[];
   isSelected?: boolean;
 }
@@ -42,7 +45,7 @@ export interface Match {
   name: string;
   url: string;
   score: number;
-  distance: number; // Add distance for display
+  distance: number;
 }
 
 export interface ProcessingStatus {
@@ -67,6 +70,18 @@ const FaceRecognition: React.FC = () => {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [exportProcessing, setExportProcessing] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to access this page",
+        variant: "destructive",
+      });
+      navigate("/login");
+    }
+  }, [navigate, toast]);
 
   const handleInputFolderSelect = useCallback((files: FileList) => {
     const validFiles: ImageFile[] = Array.from(files)

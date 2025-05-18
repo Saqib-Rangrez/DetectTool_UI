@@ -248,116 +248,6 @@ const [showAllMatches, setShowAllMatches] = React.useState<{ [key: string]: bool
             </ResizablePanel>
           </ResizablePanelGroup>
         </TabsContent>
-
-        {/* <TabsContent value="grid" className="mt-4">
-          <Card>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {results.map((file, index) => (
-                  <Card 
-                    key={file.id} 
-                    className={`overflow-hidden hover:shadow-md transition-shadow flex flex-col h-[400px] ${index === results.length - 1 ? 'animate-pulse-bg' : ''}`}
-                  >
-                    <div className="p-4 border-b bg-slate-50">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <h4 className="font-medium truncate">{truncateName(file.name)}</h4>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{file.name}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    <div className="p-4 flex flex-col flex-grow">
-                      <div className="relative h-40 mb-4 border rounded overflow-hidden flex-grow-0">
-                        {isPdf(file.name) ? (
-                          <div
-                            className="w-full h-full bg-gray-100 flex flex-col items-center justify-center text-gray-500 text-sm p-2"
-                          >
-                            <span className="font-medium text-gray-700">PDF</span>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span className="text-xs truncate max-w-full">{truncateName(file.name)}</span>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>{file.name}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
-                        ) : (
-                          <img 
-                            src={file.url} 
-                            alt={file.name} 
-                            className="w-full h-full object-fill"
-                          />
-                        )}
-                        <div className="absolute top-2 right-2">
-                          <Badge className="bg-green-600">
-                            <span className="text-xs">{file.matches?.length || 0} match{file.matches?.length === 1 ? '' : 'es'}</span>
-                          </Badge>
-                        </div>
-                      </div>
-                      
-                      {file.matches && file.matches.length > 0 ? (
-                        <div className="space-y-2 flex-grow">
-                          <h5 className="text-sm font-medium">Matches:</h5>
-                          {file.matches.slice(0, 2).map((match) => (
-                            <div key={match.id} className="flex items-center gap-2 bg-slate-50 p-2 rounded">
-                              <div className="w-12 h-12 shrink-0 rounded overflow-hidden">
-                                {isPdf(match.name) ? (
-                                  <div
-                                    className="w-full h-full bg-gray-100 flex flex-col items-center justify-center text-gray-500 text-xs p-1"
-                                  >
-                                    <span className="font-medium text-gray-700">PDF</span>
-                                    <span className="text-[10px] truncate">{truncateName(match.name, 10)}</span>
-                                  </div>
-                                ) : (
-                                  <img 
-                                    src={match.url} 
-                                    alt={match.name} 
-                                    className="w-full h-full object-contain bg-gray-100"
-                                  />
-                                )}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <p className="text-xs truncate">{truncateName(match.name)}</p>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>{match.name}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                <Badge className={`mt-1 text-[10px] ${getMatchScoreColor(match.score)}`}>
-                                  {(match.score).toFixed(2)}
-                                </Badge>
-                              </div>
-                            </div>
-                          ))}
-                          {file.matches.length > 2 && (
-                            <p className="text-xs text-center text-muted-foreground">
-                              +{file.matches.length - 2} more match{file.matches.length - 2 === 1 ? '' : 'es'}
-                            </p>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="flex-grow flex items-center justify-center">
-                          <p className="text-sm text-muted-foreground">No matches found</p>
-                        </div>
-                      )}
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent> */}
         
         <TabsContent value="grid" className="mt-4">
           <Card>
@@ -366,7 +256,7 @@ const [showAllMatches, setShowAllMatches] = React.useState<{ [key: string]: bool
                 {results.map((file, index) => (
                   <Card 
                     key={file.id} 
-                    className={`overflow-hidden hover:shadow-md transition-shadow flex flex-col h-[400px] ${index === results.length - 1 ? 'animate-pulse-bg' : ''}`}
+                    className={`overflow-hidden hover:shadow-md transition-shadow flex flex-col max-h-[400px] ${index === results.length - 1 ? 'animate-pulse-bg' : ''}`}
                   >
                     <div className="p-4 border-b bg-slate-50">
                       <TooltipProvider>

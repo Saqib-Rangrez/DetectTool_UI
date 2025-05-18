@@ -223,7 +223,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { isAuthenticated } from "@/utils/api";
+import { isAuthenticated } from "@/api/auth";
 import { toast } from "sonner";
 import { useEffect } from 'react';
 import { log } from 'console';
