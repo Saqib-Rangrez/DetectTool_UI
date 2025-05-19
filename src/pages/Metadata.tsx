@@ -5,7 +5,7 @@ import UploadModal from "@/components/UploadModal";
 import EmptyState from "@/components/EmptyState";
 import { useToast } from "@/hooks/use-toast";
 // import { isAuthenticated, uploadImageAndGetMetadata } from "@/utils/api";
-import {  uploadImageAndGetMetadata } from "@/api/services/metaData";
+import { uploadImageAndGetMetadata } from "@/api/services/metaData";
 import { isAuthenticated } from "@/api/auth";
 import { useNavigate } from "react-router-dom";
 
@@ -87,7 +87,8 @@ const Metadata = () => {
       console.error("Error fetching metadata:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to fetch metadata",
+        description:
+          error instanceof Error ? error.message : "Failed to fetch metadata",
         variant: "destructive",
       });
     } finally {
@@ -98,20 +99,23 @@ const Metadata = () => {
   const handleUploadComplete = (files: File[]) => {
     // Supported image MIME types
     const supportedImageTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'image/tiff',
-      'image/bmp',
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/tiff",
+      "image/bmp",
     ];
 
     // Filter only image files
-    const imageFiles = files.filter((file) => supportedImageTypes.includes(file.type));
+    const imageFiles = files.filter((file) =>
+      supportedImageTypes.includes(file.type)
+    );
 
     if (imageFiles.length === 0) {
       toast({
         title: "No images found",
-        description: "Please select a folder containing supported images (JPEG, PNG, GIF, TIFF, BMP)",
+        description:
+          "Please select a folder containing supported images (JPEG, PNG, GIF, TIFF, BMP)",
         variant: "destructive",
       });
       return;
@@ -134,7 +138,9 @@ const Metadata = () => {
 
     toast({
       title: "Upload complete",
-      description: `${imageFiles.length} ${imageFiles.length === 1 ? "image" : "images"} processed successfully`,
+      description: `${imageFiles.length} ${
+        imageFiles.length === 1 ? "image" : "images"
+      } processed successfully`,
     });
   };
 
@@ -155,11 +161,14 @@ const Metadata = () => {
       return;
     }
 
-    const blob = new Blob([selectedImage.headerApiData], { type: 'text/html' });
+    const blob = new Blob([selectedImage.headerApiData], { type: "text/html" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `headerstructure-${selectedImage.name.replace(/\.[^/.]+$/, '')}.html`;
+    link.download = `headerstructure-${selectedImage.name.replace(
+      /\.[^/.]+$/,
+      ""
+    )}.html`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -193,7 +202,10 @@ const Metadata = () => {
   const handleMouseDown = (e: React.MouseEvent) => {
     if (zoomLevel > 1) {
       setIsDragging(true);
-      setDragStart({ x: e.clientX - imagePosition.x, y: e.clientY - imagePosition.y });
+      setDragStart({
+        x: e.clientX - imagePosition.x,
+        y: e.clientY - imagePosition.y,
+      });
     }
   };
 
@@ -248,11 +260,12 @@ const Metadata = () => {
       </div>
 
       {images.length === 0 ? (
-        <EmptyState 
-        icon=""
-        title="No Images Uploaded"
-        description="Upload images to view and extract metadata."
-        onUploadClick={() => setUploadModalOpen(true)} />
+        <EmptyState
+          icon=""
+          title="No Images Uploaded"
+          description="Upload images to view and extract metadata."
+          onUploadClick={() => setUploadModalOpen(true)}
+        />
       ) : (
         <div className="flex flex-1 overflow-hidden">
           <div className="w-44 border-r overflow-y-auto p-2 bg-slate-50">
@@ -309,7 +322,6 @@ const Metadata = () => {
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
               >
-                
                 <img
                   ref={imageRef}
                   src={selectedImage.url}
@@ -321,14 +333,15 @@ const Metadata = () => {
                   }}
                   draggable={false}
                 />
-
               </div>
             )}
 
             {selectedImage && (
               <div
                 className={`absolute bottom-6 right-6 bg-white/90 backdrop-blur-sm rounded-lg p-2 flex items-center gap-1.5 shadow-lg transition-opacity duration-300 ${
-                  showZoomControls ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                  showZoomControls
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-4"
                 }`}
               >
                 <button
@@ -362,7 +375,9 @@ const Metadata = () => {
               <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center">
                 <div className="bg-white p-4 rounded-lg shadow-lg flex flex-col items-center">
                   <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="mt-2 text-sm font-medium">Fetching metadata...</p>
+                  <p className="mt-2 text-sm font-medium">
+                    Fetching metadata...
+                  </p>
                 </div>
               </div>
             )}
@@ -374,26 +389,38 @@ const Metadata = () => {
             </h5>
             {selectedImage && selectedImage.exifApiData ? (
               <div className="flex flex-col gap-8">
-                {Object.entries(selectedImage.exifApiData).map(([section, pairs]) => (
-                  <div key={section} className="flex flex-col bg-slate-50 rounded-lg px-2 py-4 shadow-sm">
-                    <h6 className="text-primary font-semibold mb-3">{section}</h6>
-                    <div className="grid grid-cols-[auto,1fr] gap-x-4 gap-y-2">
-                      {pairs.map(([key, value]) => (
-                        <React.Fragment key={key}>
-                          <span className="text-red-600 font-bold text-sm">{key}</span>
-                          <span className="text-gray-600 text-sm truncate text-wrap" title={value}>
-                            {value || "N/A"}
-                          </span>
-                        </React.Fragment>
-                      ))}
+                {Object.entries(selectedImage.exifApiData).map(
+                  ([section, pairs]) => (
+                    <div
+                      key={section}
+                      className="flex flex-col bg-slate-50 rounded-lg px-2 py-4 shadow-sm"
+                    >
+                      <h6 className="text-primary font-semibold mb-3">
+                        {section}
+                      </h6>
+                      <div className="grid grid-cols-[auto,1fr] gap-x-4 gap-y-2">
+                        {pairs.map(([key, value]) => (
+                          <React.Fragment key={key}>
+                            <span className="text-blue-600 font-bold text-sm">
+                              {key}
+                            </span>
+                            <span
+                              className="text-gray-600 text-sm truncate text-wrap"
+                              title={value}
+                            >
+                              {value || "N/A"}
+                            </span>
+                          </React.Fragment>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             ) : (
               <div className="alert alert-warning text-center" role="alert">
-                <i className="bi bi-exclamation-circle-fill text-warning mr-2"></i> No details
-                available
+                <i className="bi bi-exclamation-circle-fill text-warning mr-2"></i>{" "}
+                No details available
               </div>
             )}
           </div>
