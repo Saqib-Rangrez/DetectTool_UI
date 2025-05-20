@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UploadModal from '@/components/UploadModal';
-// import { detectAISingle, detectAIImages, isAuthenticated } from '@/utils/api';
 import { detectAISingle, detectAIImages } from '@/api/services/aiDetection';
 import { isAuthenticated } from '@/api/auth';
 import { useNavigate } from 'react-router-dom';
@@ -20,8 +19,8 @@ interface ProcessedFile {
   file: File;
   url: string;
   result: DetectionResult;
-  humanProbability?: number; // Percentage (e.g., 9.76)
-  aiProbability?: number;   // Percentage (e.g., 90.24)
+  humanProbability?: number; 
+  aiProbability?: number;   
 }
 
 const AIDetection: React.FC = () => {

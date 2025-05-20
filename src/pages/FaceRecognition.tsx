@@ -25,7 +25,6 @@ import FaceRecognitionInput from '@/components/FaceRecognition/FaceRecognitionIn
 import FaceRecognitionResults from '@/components/FaceRecognition/FaceRecognitionResults';
 import ExportDialog from '@/components/FaceRecognition/ExportDialog';
 import EmptyState from '@/components/FaceRecognition/EmptyState';
-// import { compareImages } from '@/utils/api';
 import { compareImages } from '@/api/services/compareFaces';
 import { isAuthenticated } from '@/api/auth';
 import { useNavigate } from 'react-router-dom';

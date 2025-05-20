@@ -3,7 +3,6 @@ import { API_BASE_URL, getAuthHeaders } from "./client";
 import { ENDPOINTS } from "./endpoints";
 import {LoginPayload} from "../types/apiTypes"
 
-
 export const isAuthenticated = (): boolean => !!getAuthToken();
 
 export async function loginUser({ email, password }: LoginPayload) {

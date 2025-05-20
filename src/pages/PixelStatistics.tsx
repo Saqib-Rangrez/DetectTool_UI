@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import ImageViewer from '@/components/copy-move-forgery/ImageViewer';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-// import { fetchImageStats } from '../utils/api';
 import { fetchImageStats } from '@/api/services/imageStats';
 
 // Define the processing modes

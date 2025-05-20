@@ -26,7 +26,6 @@ import { Loader, Info, Download, ChevronRight } from "lucide-react";
 import ImageViewer from "../components/copy-move-forgery/ImageViewer";
 import ParameterControl from "../components/copy-move-forgery/ParameterControl";
 import ResultsPanel from "../components/copy-move-forgery/ResultsPanel";
-// import { fetchCopyMoveDetection, isAuthenticated } from "../utils/api";
 import { fetchCopyMoveDetection } from "@/api/services/copyMove";
 import { isAuthenticated } from "@/api/auth";
 import { useToast } from "@/hooks/use-toast";

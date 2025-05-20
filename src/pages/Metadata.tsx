@@ -4,7 +4,6 @@ import { Upload, Download, ZoomIn, ZoomOut, Maximize } from "lucide-react";
 import UploadModal from "@/components/UploadModal";
 import EmptyState from "@/components/EmptyState";
 import { useToast } from "@/hooks/use-toast";
-// import { isAuthenticated, uploadImageAndGetMetadata } from "@/utils/api";
 import { uploadImageAndGetMetadata } from "@/api/services/metaData";
 import { isAuthenticated } from "@/api/auth";
 import { useNavigate } from "react-router-dom";

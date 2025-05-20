@@ -9,13 +9,11 @@ export async function fetchImageStats(
 ): Promise<ImageStatsResponse> {
   const formData = new FormData();
   formData.append("image", image);
-  
-  const url = new URL(`${API_BASE_URL}${ENDPOINTS.IMAGE_STATISTICS}`);
-  url.searchParams.append("mode", mode);
-  url.searchParams.append("inclusive", inclusive.toString());
+  formData.append("mode", mode);
+  formData.append("inclusive", inclusive.toString());
 
   try {
-    const response = await fetch(url.toString(), {
+    const response = await fetch(`${API_BASE_URL}${ENDPOINTS.IMAGE_STATISTICS}`, {
       method: "POST",
       headers: getAuthHeaders(),
       body: formData,
