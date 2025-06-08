@@ -1,15 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Users, Image, Bot, Menu, LogIn } from 'lucide-react';
-import { 
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuContent,
-  navigationMenuTriggerStyle
-} from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,6 +20,10 @@ const Navigation = () => {
   const currentPath = location.pathname;
   const [authenticated, setAuthenticated] = useState(isAuthenticated());
 
+  // State to manage open dropdowns
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const isActive = (path: string) => currentPath === path;
   const handleLogin = () => navigate('/login');
 
@@ -44,11 +39,11 @@ const Navigation = () => {
     console.log(authenticated);
   }, [authenticated]);
 
-  // Navigation menu items organized by new categories
+  // Navigation menu items organized by categories
   const imageAnalysisTools = [
     { title: "Pixel Statistics", path: "/pixel-statistics", icon: Users },
     { title: "Edge Detection", path: "/edge-detection", icon: Image },
-    // { title: "PCA Projection", path: "/pca-projection", icon: Bot },
+    { title: "PCA Projection", path: "/pca-projection", icon: Bot },
   ];
 
   const forgeryDetectionTools = [
@@ -63,6 +58,25 @@ const Navigation = () => {
 
   const isActiveInCategory = (items: typeof imageAnalysisTools) => {
     return items.some(item => isActive(item.path));
+  };
+
+  // Replicate NavigationMenuTrigger styling
+  const triggerStyle = cn(
+    "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-accent/50"
+  );
+
+  // Hover handlers
+  const handleMouseEnter = (dropdown: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setOpenDropdown(dropdown);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 200); // 200ms delay for better UX
   };
 
   return (
@@ -80,115 +94,161 @@ const Navigation = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:ml-0 md:flex">
-              <NavigationMenu className="px-0">
-                <NavigationMenuList>
-                  {/* Home */}
-                  <NavigationMenuItem>
-                    <Link to="/">
-                      <NavigationMenuLink className={cn(
-                        navigationMenuTriggerStyle(),
-                        isActive('/') && 'bg-accent text-accent-foreground'
-                      )}>
-                        <Image className="h-4 w-4 mr-2" /> Home
-                      </NavigationMenuLink>
-                    </Link>
-                  </NavigationMenuItem>
+            <div className="hidden md:ml-0 md:flex items-center space-x-1">
+              {/* Home */}
+              <Link to="/">
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    triggerStyle,
+                    isActive('/') && 'bg-accent text-accent-foreground'
+                  )}
+                >
+                  <Image className="h-4 w-4 mr-2" /> Home
+                </Button>
+              </Link>
 
-                  {/* Metadata (standalone) */}
-                  <NavigationMenuItem>
-                    <Link to="/metadata">
-                      <NavigationMenuLink className={cn(
-                        navigationMenuTriggerStyle(),
-                        isActive('/metadata') && 'bg-accent text-accent-foreground'
-                      )}>
-                        <Image className="h-4 w-4 mr-2" /> Metadata
-                      </NavigationMenuLink>
-                    </Link>
-                  </NavigationMenuItem>
+              {/* Metadata */}
+              <Link to="/metadata">
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    triggerStyle,
+                    isActive('/metadata') && 'bg-accent text-accent-foreground'
+                  )}
+                >
+                  <Image className="h-4 w-4 mr-2" /> Metadata
+                </Button>
+              </Link>
 
-                  {/* Image Analysis Dropdown */}
-                  <NavigationMenuItem value="image-analysis">
-                    <NavigationMenuTrigger className={cn(
+              {/* Image Analysis Dropdown */}
+              <DropdownMenu
+                open={openDropdown === 'image-analysis'}
+                onOpenChange={(open) => !open && setOpenDropdown(null)}
+              >
+                <DropdownMenuTrigger
+                  asChild
+                  onMouseEnter={() => handleMouseEnter('image-analysis')}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      triggerStyle,
                       isActiveInCategory(imageAnalysisTools) && 'bg-accent text-accent-foreground'
-                    )}>
-                      <Image className="h-4 w-4 mr-2" />
-                      Image Analysis
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent className="data-[state=open]:absolute data-[state=open]:left-[-100px]">
-                      <div className="grid w-[300px] gap-1 p-2">
-                        {imageAnalysisTools.map((item) => (
-                          <Link key={item.path} to={item.path}>
-                            <NavigationMenuLink className={cn(
-                              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-                              isActive(item.path) && 'bg-accent text-accent-foreground'
-                            )}>
-                              <div className="flex items-center gap-2">
-                                <item.icon className="h-4 w-4" />
-                                <div className="text-sm font-medium">{item.title}</div>
-                              </div>
-                            </NavigationMenuLink>
-                          </Link>
-                        ))}
-                      </div>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
+                    )}
+                  >
+                    <Image className="h-4 w-4 mr-2" />
+                    Image Analysis
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-[300px] p-2 flex flex-col gap-1"
+                  onMouseEnter={() => handleMouseEnter('image-analysis')}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {imageAnalysisTools.map((item) => (
+                    <DropdownMenuItem key={item.path} asChild>
+                      <Link
+                        to={item.path}
+                        className={cn(
+                          "flex items-center gap-2 w-full rounded-md p-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer",
+                          isActive(item.path) && 'bg-accent text-accent-foreground'
+                        )}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {item.title}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-                  {/* Forgery Detection Dropdown */}
-                  <NavigationMenuItem value="forgery-detection">
-                    <NavigationMenuTrigger className={cn(
+              {/* Forgery Detection Dropdown */}
+              <DropdownMenu
+                open={openDropdown === 'forgery-detection'}
+                onOpenChange={(open) => !open && setOpenDropdown(null)}
+              >
+                <DropdownMenuTrigger
+                  asChild
+                  onMouseEnter={() => handleMouseEnter('forgery-detection')}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      triggerStyle,
                       isActiveInCategory(forgeryDetectionTools) && 'bg-accent text-accent-foreground'
-                    )}>
-                      <Bot className="h-4 w-4 mr-2" />
-                      Forgery Detection
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent className="data-[state=open]:absolute data-[state=open]:left-[-200px]">
-                      <div className="grid w-[300px] gap-1 p-2">
-                        {forgeryDetectionTools.map((item) => (
-                          <Link key={item.path} to={item.path}>
-                            <NavigationMenuLink className={cn(
-                              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-                              isActive(item.path) && 'bg-accent text-accent-foreground'
-                            )}>
-                              <div className="flex items-center gap-2">
-                                <item.icon className="h-4 w-4" />
-                                <div className="text-sm font-medium">{item.title}</div>
-                              </div>
-                            </NavigationMenuLink>
-                          </Link>
-                        ))}
-                      </div>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
+                    )}
+                  >
+                    <Bot className="h-4 w-4 mr-2" />
+                    Forgery Detection
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-[300px] p-2 flex flex-col gap-1"
+                  onMouseEnter={() => handleMouseEnter('forgery-detection')}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {forgeryDetectionTools.map((item) => (
+                    <DropdownMenuItem key={item.path} asChild>
+                      <Link
+                        to={item.path}
+                        className={cn(
+                          "flex items-center gap-2 w-full rounded-md p-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer",
+                          isActive(item.path) && 'bg-accent text-accent-foreground'
+                        )}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {item.title}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-                  {/* AI & Recognition Dropdown */}
-                  <NavigationMenuItem value="ai-recognition">
-                    <NavigationMenuTrigger className={cn(
+              {/* AI & Recognition Dropdown */}
+              <DropdownMenu
+                open={openDropdown === 'ai-recognition'}
+                onOpenChange={(open) => !open && setOpenDropdown(null)}
+              >
+                <DropdownMenuTrigger
+                  asChild
+                  onMouseEnter={() => handleMouseEnter('ai-recognition')}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      triggerStyle,
                       isActiveInCategory(aiRecognitionTools) && 'bg-accent text-accent-foreground'
-                    )}>
-                      <Users className="h-4 w-4 mr-2" />
-                      AI & Recognition
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent className="data-[state=open]:absolute data-[state=open]:left-[-300px]">
-                      <div className="grid w-[300px] gap-1 p-2">
-                        {aiRecognitionTools.map((item) => (
-                          <Link key={item.path} to={item.path}>
-                            <NavigationMenuLink className={cn(
-                              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-                              isActive(item.path) && 'bg-accent text-accent-foreground'
-                            )}>
-                              <div className="flex items-center gap-2">
-                                <item.icon className="h-4 w-4" />
-                                <div className="text-sm font-medium">{item.title}</div>
-                              </div>
-                            </NavigationMenuLink>
-                          </Link>
-                        ))}
-                      </div>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
+                    )}
+                  >
+                    <Users className="h-4 w-4 mr-2" />
+                    AI & Recognition
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-[300px] p-2 flex flex-col gap-1"
+                  onMouseEnter={() => handleMouseEnter('ai-recognition')}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {aiRecognitionTools.map((item) => (
+                    <DropdownMenuItem key={item.path} asChild>
+                      <Link
+                        to={item.path}
+                        className={cn(
+                          "flex items-center gap-2 w-full rounded-md p-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer",
+                          isActive(item.path) && 'bg-accent text-accent-foreground'
+                        )}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {item.title}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
