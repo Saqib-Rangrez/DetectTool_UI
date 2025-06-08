@@ -105,7 +105,7 @@ const PixelStatistics = () => {
 
   return (
     <div className="container max-w-full px-2 py-3 md:px-6">
-      <h1 className="text-2xl font-bold mb-4 text-primary">Pixel Statistics</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-4">Pixel Statistics</h1>
       
       {/* Controls Section - Modern, compact design */}
       <Card className="mb-4 shadow-sm glass-card border-opacity-50">

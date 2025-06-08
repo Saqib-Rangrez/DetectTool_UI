@@ -272,7 +272,7 @@ const AIDetection: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-slate-50">
       {/* Page Header */}
       <div className="border-b bg-white p-4 flex justify-between items-center shadow-sm">
-        <h1 className="text-xl font-semibold">Detect AI or Not</h1>
+        <h1 className="text-2xl font-bold text-foreground">Detect AI or Not</h1>
         <div className="flex gap-2">
           <Button 
             onClick={handleUploadClick}

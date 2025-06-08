@@ -1,211 +1,4 @@
-// import React, { useState } from 'react';
-// import { Link, useLocation, useNavigate } from 'react-router-dom';
-// import { Users, Image, Bot, Menu, User, LogIn } from 'lucide-react';
-// import { 
-//   NavigationMenu,
-//   NavigationMenuContent,
-//   NavigationMenuItem,
-//   NavigationMenuLink,
-//   NavigationMenuList,
-//   NavigationMenuTrigger,
-//   navigationMenuTriggerStyle
-// } from "@/components/ui/navigation-menu";
-// import { Button } from "@/components/ui/button";
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu";
-// import { cn } from "@/lib/utils";
-// import { isAuthenticated } from "@/utils/api"; // Import isAuthenticated
-
-// const Navigation = () => {
-//   const location = useLocation();
-//   const navigate = useNavigate();
-//   const currentPath = location.pathname;
-//   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-//   const isActive = (path: string) => currentPath === path;
-
-//   const handleLogin = () => {
-//     navigate('/login');
-//   };
-
-//   const authenticated = isAuthenticated(); // Check authentication status
-
-//   return (
-//     <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-//       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-//         <div className="flex justify-between h-16">
-//           <div className="flex items-center">
-//             {/* App Logo */}
-//             <Link to="/" className="flex items-center">
-//               <img 
-//                 src="\KPMGLogo.png" 
-//                 alt="Logo" 
-//                 className='h-20 w-20 mr-20' 
-//               />              
-//             </Link>
-            
-//             {/* Desktop Navigation */}
-//             <div className="hidden md:ml-6 md:flex">
-//               <NavigationMenu className="px-4">
-//                 <NavigationMenuList>
-//                   <NavigationMenuItem>
-//                     <Link to="/">
-//                       <NavigationMenuLink className={cn(
-//                         navigationMenuTriggerStyle(),
-//                         isActive('/') && "bg-accent text-accent-foreground"
-//                       )}>
-//                         <Image className="h-4 w-4 mr-2" />
-//                         Home
-//                       </NavigationMenuLink>
-//                     </Link>
-//                   </NavigationMenuItem>
-                  
-//                   <NavigationMenuItem>
-//                     <NavigationMenuTrigger className={isActive('/metadata') ? "bg-accent text-accent-foreground" : ""}>
-//                       <Image className="h-4 w-4 mr-2" />
-//                       Image Analysis
-//                     </NavigationMenuTrigger>
-//                     <NavigationMenuContent>
-//                       <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-//                         <li className="row-span-3">
-//                           <Link
-//                             to="/metadata"
-//                             className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-//                           >
-//                             <Image className="h-6 w-6 mb-2" />
-//                             <div className="mb-2 mt-4 text-lg font-medium">
-//                               Metadata
-//                             </div>
-//                             <p className="text-sm leading-tight text-muted-foreground">
-//                               Extract and analyze image metadata information
-//                             </p>
-//                           </Link>
-//                         </li>
-//                         <li>
-//                           <Link
-//                             to="/detect-ai"
-//                             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-//                           >
-//                             <div className="flex items-center gap-2">
-//                               <Bot className="h-4 w-4" />
-//                               <div className="text-sm font-medium leading-none">
-//                                 AI Detection
-//                               </div>
-//                             </div>
-//                             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-//                               Detect AI-generated content in images
-//                             </p>
-//                           </Link>
-//                         </li>
-//                         <li>
-//                           <Link
-//                             to="/face-recognition"
-//                             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-//                           >
-//                             <div className="flex items-center gap-2">
-//                               <Users className="h-4 w-4" />
-//                               <div className="text-sm font-medium leading-none">
-//                                 Face Recognition
-//                               </div>
-//                             </div>
-//                             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-//                               Compare and match faces across multiple images
-//                             </p>
-//                           </Link>
-//                         </li>
-//                       </ul>
-//                     </NavigationMenuContent>
-//                   </NavigationMenuItem>
-//                 </NavigationMenuList>
-//               </NavigationMenu>
-//             </div>
-//           </div>
-
-//           {/* Right side - User menu */}
-//           <div className="hidden md:flex items-center space-x-2">
-//             {!authenticated && (
-//               <Button 
-//                 variant="outline" 
-//                 size="sm" 
-//                 onClick={handleLogin}
-//                 className="flex items-center gap-2"
-//               >
-//                 <LogIn className="h-4 w-4" />
-//                 <span>Login</span>
-//               </Button>
-//             )}
-//           </div>
-
-//           {/* Mobile menu button */}
-//           <div className="flex items-center md:hidden">
-//             <DropdownMenu>
-//               <DropdownMenuTrigger asChild>
-//                 <Button variant="ghost" size="icon">
-//                   <Menu className="h-6 w-6" />
-//                 </Button>
-//               </DropdownMenuTrigger>
-//               <DropdownMenuContent align="end" className="w-52">
-//                 <DropdownMenuItem asChild>
-//                   <Link to="/" className="flex items-center gap-2">
-//                     <Image className="h-4 w-4" />
-//                     Home
-//                   </Link>
-//                 </DropdownMenuItem>
-//                 <DropdownMenuItem asChild>
-//                   <Link to="/metadata" className="flex items-center gap-2">
-//                     <Image className="h-4 w-4" />
-//                     Metadata
-//                   </Link>
-//                 </DropdownMenuItem>
-//                 <DropdownMenuItem asChild>
-//                   <Link to="/detect-ai" className="flex items-center gap-2">
-//                     <Bot className="h-4 w-4" />
-//                     AI Detection
-//                   </Link>
-//                 </DropdownMenuItem>
-//                 <DropdownMenuItem asChild>
-//                   <Link to="/face-recognition" className="flex items-center gap-2">
-//                     <Users className="h-4 w-4" />
-//                     Face Recognition
-//                   </Link>
-//                 </DropdownMenuItem>
-//                 {!authenticated && (
-//                   <DropdownMenuItem 
-//                     onClick={handleLogin} 
-//                     className="flex items-center gap-2"
-//                   >
-//                     <LogIn className="h-4 w-4" />
-//                     Login
-//                   </DropdownMenuItem>
-//                 )}
-//               </DropdownMenuContent>
-//             </DropdownMenu>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Navigation;
-
-
-
-
-
-
-
-
-
-
-
-
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Users, Image, Bot, Menu, LogIn } from 'lucide-react';
 import { 
@@ -213,6 +6,8 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
   navigationMenuTriggerStyle
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
@@ -221,42 +16,58 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { isAuthenticated } from "@/api/auth";
 import { toast } from "sonner";
-import { useEffect } from 'react';
-import { log } from 'console';
 
 const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authenticated, setAuthenticated] = useState(isAuthenticated());
 
   const isActive = (path: string) => currentPath === path;
   const handleLogin = () => navigate('/login');
-  const [authenticated, setAuthenticated] = useState(isAuthenticated());
-
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('access_token_timestamp');
-    setAuthenticated(false); // 👈 Add this
+    setAuthenticated(false);
     toast.success("Logged out successfully");
     navigate('/login', { replace: true });
   };
 
-
   useEffect(() => {
-    console.log(authenticated)
-  }, []);
-  
+    console.log(authenticated);
+  }, [authenticated]);
 
+  // Navigation menu items organized by new categories
+  const imageAnalysisTools = [
+    { title: "Pixel Statistics", path: "/pixel-statistics", icon: Users },
+    { title: "Edge Detection", path: "/edge-detection", icon: Image },
+    // { title: "PCA Projection", path: "/pca-projection", icon: Bot },
+  ];
+
+  const forgeryDetectionTools = [
+    { title: "Copy-Move Forgery", path: "/copy-move-forgery", icon: Users },
+    { title: "Error Level Analysis", path: "/error-level-analysis", icon: Image },
+  ];
+
+  const aiRecognitionTools = [
+    { title: "AI Detection", path: "/detect-ai", icon: Bot },
+    { title: "Face Recognition", path: "/face-recognition", icon: Users },
+  ];
+
+  const isActiveInCategory = (items: typeof imageAnalysisTools) => {
+    return items.some(item => isActive(item.path));
+  };
 
   return (
-    <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             {/* App Logo */}
@@ -264,13 +75,15 @@ const Navigation = () => {
               <img 
                 src="/KPMGLogo.png" 
                 alt="Logo" 
-                className='h-20 w-20 mr-20' 
+                className='h-20 w-20 mr-8' 
               />              
             </Link>
+
             {/* Desktop Navigation */}
             <div className="hidden md:ml-0 md:flex">
-              <NavigationMenu className="px-4">
+              <NavigationMenu className="px-0">
                 <NavigationMenuList>
+                  {/* Home */}
                   <NavigationMenuItem>
                     <Link to="/">
                       <NavigationMenuLink className={cn(
@@ -281,6 +94,8 @@ const Navigation = () => {
                       </NavigationMenuLink>
                     </Link>
                   </NavigationMenuItem>
+
+                  {/* Metadata (standalone) */}
                   <NavigationMenuItem>
                     <Link to="/metadata">
                       <NavigationMenuLink className={cn(
@@ -291,50 +106,92 @@ const Navigation = () => {
                       </NavigationMenuLink>
                     </Link>
                   </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <Link to="/detect-ai">
-                      <NavigationMenuLink className={cn(
-                        navigationMenuTriggerStyle(),
-                        isActive('/detect-ai') && 'bg-accent text-accent-foreground'
-                      )}>
-                        <Bot className="h-4 w-4 mr-2" /> AI Detection
-                      </NavigationMenuLink>
-                    </Link>
+
+                  {/* Image Analysis Dropdown */}
+                  <NavigationMenuItem value="image-analysis">
+                    <NavigationMenuTrigger className={cn(
+                      isActiveInCategory(imageAnalysisTools) && 'bg-accent text-accent-foreground'
+                    )}>
+                      <Image className="h-4 w-4 mr-2" />
+                      Image Analysis
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent className="data-[state=open]:absolute data-[state=open]:left-[-100px]">
+                      <div className="grid w-[300px] gap-1 p-2">
+                        {imageAnalysisTools.map((item) => (
+                          <Link key={item.path} to={item.path}>
+                            <NavigationMenuLink className={cn(
+                              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                              isActive(item.path) && 'bg-accent text-accent-foreground'
+                            )}>
+                              <div className="flex items-center gap-2">
+                                <item.icon className="h-4 w-4" />
+                                <div className="text-sm font-medium">{item.title}</div>
+                              </div>
+                            </NavigationMenuLink>
+                          </Link>
+                        ))}
+                      </div>
+                    </NavigationMenuContent>
                   </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <Link to="/face-recognition">
-                      <NavigationMenuLink className={cn(
-                        navigationMenuTriggerStyle(),
-                        isActive('/face-recognition') && 'bg-accent text-accent-foreground'
-                      )}>
-                        <Users className="h-4 w-4 mr-2" /> Face Recognition
-                      </NavigationMenuLink>
-                    </Link>
+
+                  {/* Forgery Detection Dropdown */}
+                  <NavigationMenuItem value="forgery-detection">
+                    <NavigationMenuTrigger className={cn(
+                      isActiveInCategory(forgeryDetectionTools) && 'bg-accent text-accent-foreground'
+                    )}>
+                      <Bot className="h-4 w-4 mr-2" />
+                      Forgery Detection
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent className="data-[state=open]:absolute data-[state=open]:left-[-200px]">
+                      <div className="grid w-[300px] gap-1 p-2">
+                        {forgeryDetectionTools.map((item) => (
+                          <Link key={item.path} to={item.path}>
+                            <NavigationMenuLink className={cn(
+                              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                              isActive(item.path) && 'bg-accent text-accent-foreground'
+                            )}>
+                              <div className="flex items-center gap-2">
+                                <item.icon className="h-4 w-4" />
+                                <div className="text-sm font-medium">{item.title}</div>
+                              </div>
+                            </NavigationMenuLink>
+                          </Link>
+                        ))}
+                      </div>
+                    </NavigationMenuContent>
                   </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <Link to="/pixel-statistics">
-                      <NavigationMenuLink className={cn(
-                        navigationMenuTriggerStyle(),
-                        isActive('/pixel-statistics') && 'bg-accent text-accent-foreground'
-                      )}>
-                        <Users className="h-4 w-4 mr-2" /> Pixel Statistics
-                      </NavigationMenuLink>
-                    </Link>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <Link to="/copy-move-forgery">
-                      <NavigationMenuLink className={cn(
-                        navigationMenuTriggerStyle(),
-                        isActive('/copy-move-forgery') && 'bg-accent text-accent-foreground'
-                      )}>
-                        <Users className="h-4 w-4 mr-2" /> Copy-Move Forgery
-                      </NavigationMenuLink>
-                    </Link>
+
+                  {/* AI & Recognition Dropdown */}
+                  <NavigationMenuItem value="ai-recognition">
+                    <NavigationMenuTrigger className={cn(
+                      isActiveInCategory(aiRecognitionTools) && 'bg-accent text-accent-foreground'
+                    )}>
+                      <Users className="h-4 w-4 mr-2" />
+                      AI & Recognition
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent className="data-[state=open]:absolute data-[state=open]:left-[-300px]">
+                      <div className="grid w-[300px] gap-1 p-2">
+                        {aiRecognitionTools.map((item) => (
+                          <Link key={item.path} to={item.path}>
+                            <NavigationMenuLink className={cn(
+                              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                              isActive(item.path) && 'bg-accent text-accent-foreground'
+                            )}>
+                              <div className="flex items-center gap-2">
+                                <item.icon className="h-4 w-4" />
+                                <div className="text-sm font-medium">{item.title}</div>
+                              </div>
+                            </NavigationMenuLink>
+                          </Link>
+                        ))}
+                      </div>
+                    </NavigationMenuContent>
                   </NavigationMenuItem>
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
           </div>
+
           {/* Right side - User menu */}
           <div className="hidden md:flex items-center space-x-2">
             {!authenticated && (
@@ -359,8 +216,8 @@ const Navigation = () => {
                 <span>Logout</span>
               </Button>
             )}
-            
           </div>
+
           {/* Mobile menu button */}
           <div className="flex items-center md:hidden">
             <DropdownMenu>
@@ -369,27 +226,50 @@ const Navigation = () => {
                   <Menu className="h-6 w-6" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuItem asChild>
                   <Link to="/" className="flex items-center gap-2">
                     <Image className="h-4 w-4" /> Home
                   </Link>
                 </DropdownMenuItem>
+                
                 <DropdownMenuItem asChild>
                   <Link to="/metadata" className="flex items-center gap-2">
                     <Image className="h-4 w-4" /> Metadata
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/detect-ai" className="flex items-center gap-2">
-                    <Bot className="h-4 w-4" /> AI Detection
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/face-recognition" className="flex items-center gap-2">
-                    <Users className="h-4 w-4" /> Face Recognition
-                  </Link>
-                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Image Analysis</DropdownMenuLabel>
+                {imageAnalysisTools.map((item) => (
+                  <DropdownMenuItem key={item.path} asChild>
+                    <Link to={item.path} className="flex items-center gap-2">
+                      <item.icon className="h-4 w-4" /> {item.title}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Forgery Detection</DropdownMenuLabel>
+                {forgeryDetectionTools.map((item) => (
+                  <DropdownMenuItem key={item.path} asChild>
+                    <Link to={item.path} className="flex items-center gap-2">
+                      <item.icon className="h-4 w-4" /> {item.title}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>AI & Recognition</DropdownMenuLabel>
+                {aiRecognitionTools.map((item) => (
+                  <DropdownMenuItem key={item.path} asChild>
+                    <Link to={item.path} className="flex items-center gap-2">
+                      <item.icon className="h-4 w-4" /> {item.title}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+
+                <DropdownMenuSeparator />
                 {!authenticated && (
                   <DropdownMenuItem 
                     onClick={handleLogin} 
@@ -398,18 +278,14 @@ const Navigation = () => {
                     <LogIn className="h-4 w-4" /> Login
                   </DropdownMenuItem>
                 )}
-                {
-                  authenticated && (
-                    <DropdownMenuItem 
-                      onClick={() => {
-                        handleLogout(); 
-                      }} 
-                      className="flex items-center gap-2"
-                    >
-                      <LogIn className="h-4 w-4" /> Logout
-                    </DropdownMenuItem>
-                  ) 
-                }
+                {authenticated && (
+                  <DropdownMenuItem 
+                    onClick={handleLogout} 
+                    className="flex items-center gap-2"
+                  >
+                    <LogIn className="h-4 w-4" /> Logout
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

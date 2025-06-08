@@ -236,7 +236,7 @@ const Metadata = () => {
   return (
     <div className="flex flex-col h-screen">
       <div className="border-b bg-white p-3 flex justify-between items-center shadow-sm">
-        <h1 className="text-lg font-semibold">Get Metadata</h1>
+        <h1 className="text-2xl font-bold text-foreground">Get Metadata</h1>
         <div className="flex gap-2">
           <Button
             variant="outline"

@@ -355,7 +355,7 @@ const FaceRecognition: React.FC = () => {
       <div className="border-b bg-white p-4 flex justify-between items-center shadow-sm">
         <div className="flex items-center gap-2">
           <Users className="h-5 w-5 text-primary" />
-          <h1 className="text-xl font-semibold">Face Recognition</h1>
+          <h1 className="text-2xl font-bold text-foreground">Face Recognition</h1>
         </div>
       </div>
 

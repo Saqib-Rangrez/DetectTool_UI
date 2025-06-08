@@ -15,6 +15,9 @@ import { useAutoLogout } from '@/hooks/useAutoLogout';
 import { AutoLogoutHandler } from "./components/AutoLogoutHandler";
 import PixelStatistics from "./pages/PixelStatistics";
 import CopyMoveForgery from "./pages/CopyMoveForgery";
+import EdgeDetection from "./pages/EdgeDetection";
+import ErrorLevelAnalysis from "./pages/ErrorLevelAnalysis";
+// import PCAProjection from "./pages/PCAProjection";
 
 // Add Inter font import
 const interFontLink = document.createElement('link');
@@ -51,6 +54,9 @@ const App = () => {
                         <Route path="/pixel-statistics" element={<PixelStatistics />} />
                         <Route path="/pixel-statistics" element={<PixelStatistics />} />
                         <Route path="/copy-move-forgery" element={<CopyMoveForgery />} />
+                        <Route path="/edge-detection" element={<EdgeDetection />} />
+                        <Route path="/error-level-analysis" element={<ErrorLevelAnalysis />} /> 
+                        {/* <Route path="/Pca-projection" element={<PCAProjection />} />  */}
 
                         <Route path="*" element={<NotFound />} />
                       </Routes>
