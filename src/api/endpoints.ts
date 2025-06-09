@@ -8,5 +8,6 @@ export const ENDPOINTS = {
   DETECT_COPY_MOVE : '/detect-copy-move',
   EDGE_FILTER : "/echo-edge-filter",
   ERROR_LEVEL_ANALYSIS: "/errorlevel",
+  PCA_ANALYSIS : "/pca",
   LOGIN: '/login',
 };

@@ -7,7 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 import ImageViewer from "@/components/copy-move-forgery/ImageViewer";
+import { fetchPcaAnalysis } from "@/api/services/pcaAnalysis";
 
 const PCAProjection = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -30,25 +32,61 @@ const PCAProjection = () => {
   };
 
   const handleAnalyze = async () => {
-    if (!selectedImageFile || !component || !mode) return;
+    if (!selectedImageFile || !component || !mode) {
+      toast.error("Please select an image, component, and mode");
+      return;
+    }
 
     setIsProcessing(true);
-    
+
+    // Map UI mode values to API-expected format
+    const modeMap: { [key: string]: string } = {
+      distance: "Distance",
+      projection: "Projection",
+      crossproduct: "Cross Product",
+    };
+    const apiMode = modeMap[mode.toLowerCase()] || mode;
+
     try {
-      // Simulate processing - replace with actual API call
-      setTimeout(() => {
-        setProcessedImageUrl(selectedImage); // For demo purposes
-        setTableData({
-          meanVector: { red: 128.45, green: 142.33, blue: 156.78 },
-          eigenvector1: { red: 0.577, green: 0.577, blue: 0.577 },
-          eigenvector2: { red: -0.707, green: 0.707, blue: 0.000 },
-          eigenvector3: { red: -0.408, green: -0.408, blue: 0.816 },
-          eigenvalues: { red: 1250.4, green: 890.2, blue: 345.8 }
-        });
-        setIsProcessing(false);
-      }, 2000);
+      const response = await fetchPcaAnalysis(
+        selectedImageFile,
+        `#${component}`,
+        apiMode,
+        invert,
+        equalize
+      );
+      setProcessedImageUrl(response.imageUrl);
+      setTableData({
+        meanVector: {
+          red: response.pca_data.mean_vector[0],
+          green: response.pca_data.mean_vector[1],
+          blue: response.pca_data.mean_vector[2],
+        },
+        eigenvector1: {
+          red: response.pca_data.eigenvectors[0][0],
+          green: response.pca_data.eigenvectors[0][1],
+          blue: response.pca_data.eigenvectors[0][2],
+        },
+        eigenvector2: {
+          red: response.pca_data.eigenvectors[1][0],
+          green: response.pca_data.eigenvectors[1][1],
+          blue: response.pca_data.eigenvectors[1][2],
+        },
+        eigenvector3: {
+          red: response.pca_data.eigenvectors[2][0],
+          green: response.pca_data.eigenvectors[2][1],
+          blue: response.pca_data.eigenvectors[2][2],
+        },
+        eigenvalues: {
+          red: response.pca_data.eigenvalues[0],
+          green: response.pca_data.eigenvalues[1],
+          blue: response.pca_data.eigenvalues[2],
+        },
+      });
+      toast.success("PCA analysis completed successfully");
     } catch (error) {
-      console.error("Error processing image:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to complete PCA analysis");
+    } finally {
       setIsProcessing(false);
     }
   };
@@ -59,6 +97,9 @@ const PCAProjection = () => {
       link.href = processedImageUrl;
       link.download = 'pca_processed_image.png';
       link.click();
+      toast.success("Processed image exported");
+    } else {
+      toast.error("No processed image to export");
     }
   };
 
@@ -71,6 +112,7 @@ const PCAProjection = () => {
     setEqualize(false);
     setProcessedImageUrl(null);
     setTableData(null);
+    toast.success("Parameters reset to default");
   };
 
   const handleInvertChange = (checked: boolean | "indeterminate") => {
@@ -313,9 +355,24 @@ const PCAProjection = () => {
                         <TableRow>
                           <TableHead className="w-16">Sr. No.</TableHead>
                           <TableHead>Element</TableHead>
-                          <TableHead className="text-right">Red</TableHead>
-                          <TableHead className="text-right">Green</TableHead>
-                          <TableHead className="text-right">Blue</TableHead>
+                          <TableHead className="text-right">
+                            <div className="flex items-center justify-end">
+                              <div className="h-3 w-3 rounded-full bg-red-500 mr-2"></div>
+                              <span>Red</span>
+                            </div>
+                          </TableHead>
+                          <TableHead className="text-right">
+                            <div className="flex items-center justify-end">
+                            <div className="h-3 w-3 rounded-full bg-green-500 mr-2"></div>
+                            <span>Green</span>
+                          </div>
+                          </TableHead>
+                          <TableHead className="text-right">
+                            <div className="flex items-center justify-end">
+                              <div className="h-3 w-3 rounded-full bg-blue-500 mr-2"></div>
+                            <span>Blue</span>
+                          </div>
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
