@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Users, Image, Bot, Menu, LogIn } from 'lucide-react';
+import { Users, Image, Bot, Menu, LogIn, BarChart3 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -266,15 +266,31 @@ const Navigation = () => {
               </Button>
             )}
             {authenticated && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleLogout}
-                className="flex items-center gap-2"
-              >
-                <LogIn className="h-4 w-4" />
-                <span>Logout</span>
-              </Button>
+              <div className='flex items-center gap-2'> 
+                <Link to="/dashboard">
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "group inline-flex h-10 w-max items-center justify-center rounded-lg bg-transparent px-4 py-2 text-sm font-medium transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none",
+                      isActive('/dashboard') && 'bg-accent text-accent-foreground'
+                    )}
+                  >
+                    <BarChart3 className="h-4 w-4 mr-2 transition-colors" /> 
+                    Dashboard
+                  </Button>
+                </Link>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleLogout}
+                  className="flex items-center gap-2"
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span>Logout</span>
+                </Button>
+              </div>
+              
             )}
           </div>
 

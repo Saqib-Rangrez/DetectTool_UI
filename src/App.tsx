@@ -18,6 +18,7 @@ import CopyMoveForgery from "./pages/CopyMoveForgery";
 import EdgeDetection from "./pages/EdgeDetection";
 import ErrorLevelAnalysis from "./pages/ErrorLevelAnalysis";
 import PCAProjection from "./pages/PCAProjection";
+import Dashboard from "./pages/Dashboard";
 
 // Add Inter font import
 const interFontLink = document.createElement('link');
@@ -48,6 +49,7 @@ const App = () => {
                     <div className="flex-grow">
                       <Routes>
                         <Route path="/" element={<Index />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/metadata" element={<Metadata />} />
                         <Route path="/detect-ai" element={<AIDetection />} />
                         <Route path="/face-recognition" element={<FaceRecognition />} />
